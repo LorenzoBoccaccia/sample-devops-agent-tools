@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.9.3
+## [1.9.3] - 2026-09-28
 
 Full-repository inspection pass — every file read in full; all confirmed defects fixed.
 
@@ -77,7 +77,7 @@ decision-trees/; "next available ID" examples corrected (Op33/R23/S40/Sc24/P17/O
 **check-consistency.sh:** EXPECTED_CORE=288, CP=20, stale-pattern check extended to
 279/A1–A23, AX13 remediation spot-check added. All 45+ checks pass.
 
-## 1.9.2
+## [1.9.2] - 2026-09-27
 
 Evaluation coverage, incremental-write verification, and consistency tooling.
 
@@ -107,7 +107,7 @@ Evaluation coverage, incremental-write verification, and consistency tooling.
   repetitions (Step 7 blockquote, grading paragraph, Step 7b, Step 8 coverage gate, common
   failure modes) are one-line pointers to it.
 
-## 1.9.1
+## [1.9.1] - 2026-09-26
 
 Write-at-every-phase artifact model — the report is now written to at every step of the
 workflow, not assembled at the end.
@@ -133,7 +133,7 @@ Step 7b  → QA gate result
 Step 8   → executive summary, action plan, N/A section, alarms, appendix
 ```
 
-## 1.9.0
+## [1.9.0] - 2026-09-25
 
 Second-pass technical gap review — safety, evidence discipline, false-positive controls,
 query fixes, RBAC documentation, decision trees, and new checks closing coverage gaps.
@@ -211,7 +211,7 @@ Added `minimum-rbac.md` link in the "Required access" section.
 qa-checklist.md, report-format.md, and scorecard-template.md. Scorecard template updated with
 all 16 new check-ID rows.
 
-## 1.8.11
+## [1.8.11] - 2026-09-24
 
 Add CloudWatch Logs Insights queries CP19–CP25 to
 `control-plane-health/queries.md` (+ threshold lines in `control-plane-health/thresholds.md`),
@@ -223,7 +223,7 @@ Auditing & Logging best practices, GuardDuty guidance):
   mutations, CP23 WATCH volume by user agent, CP24 mutations by user (attribution), CP25 anonymous
   access. CP1–CP18 remain the core set; CP19–CP25 are additional diagnostics.
 
-## 1.8.10
+## [1.8.10] - 2026-09-23
 
 Front-load the non-negotiables so a skimming/summarizing agent can't miss them (root cause:
 a run distilled the instructions, skipped loading the pillar/QA reference files, and skipped
@@ -241,7 +241,7 @@ the QA gate):
 These duplicate the mid-document gates on purpose — the failure mode is skipping past them, so
 the hard rules now appear first. No change to check definitions, thresholds, or report structure.
 
-## 1.8.9
+## [1.8.9] - 2026-09-22
 
 Add context-window management so long reviews finish gracefully without losing work:
 
@@ -254,7 +254,7 @@ Add context-window management so long reviews finish gracefully without losing w
   "not assessed — context limit") + reference-table row. Builds on the Step 5c checkpoint and
   Step 7b QA gate. No change to check definitions, thresholds, or report structure.
 
-## 1.8.8
+## [1.8.8] - 2026-09-21
 
 Add an intermediate discovery checkpoint for resumability, early visibility, and audit:
 
@@ -266,7 +266,7 @@ Add an intermediate discovery checkpoint for resumability, early visibility, and
   checkpoint, not the final artifact — the graded report is still produced at Step 8, and
   the inventory JSON is reused as the report appendix.
 
-## 1.8.7
+## [1.8.7] - 2026-09-20
 
 Close the remaining conditional-loading and data-source gaps:
 
@@ -282,7 +282,7 @@ Close the remaining conditional-loading and data-source gaps:
   files were loaded and why, plus the Step 7b per-pillar row-count reconciliation, for
   auditability. No change to check definitions, thresholds, or report structure.
 
-## 1.8.6
+## [1.8.6] - 2026-09-19
 
 Built-in QA compliance gate so the coverage requirement is enforced as a step, not
 just described:
@@ -302,7 +302,7 @@ just described:
 - Reference table updated with both new files. No change to check definitions,
   thresholds, or report structure.
 
-## 1.8.5
+## [1.8.5] - 2026-09-18
 
 Process-enforcement pass (complements 1.8.4's inventory) — addresses a review run
 that loaded no pillar files, ran ~15 of 49 discovery areas, invented check IDs,
@@ -324,7 +324,7 @@ and skipped the coverage gate:
 
 No change to any check definition, threshold, remediation, or report structure.
 
-## 1.8.4
+## [1.8.4] - 2026-09-17
 
 Enforce full check coverage so reviews stop grading only a subset (root cause of
 reports that scored ~46 of 263 checks and mislabeled IDs):
@@ -343,7 +343,7 @@ reports that scored ~46 of 263 checks and mislabeled IDs):
 - **`report-format.md` coverage-gate additions** mirror the enumerated counts and
   ID-integrity rules. No change to any check definition, threshold, or workflow logic.
 
-## 1.8.3
+## [1.8.3] - 2026-09-16
 
 Fix skill upload rejection (`400 ValidationException` from the AWS DevOps Agent
 Asset API):
@@ -357,7 +357,7 @@ Asset API):
   frontmatter. Description (with its trigger phrases) is unchanged and within
   the 1024-char limit.
 
-## 1.8.2
+## [1.8.2] - 2026-09-15
 
 Reference file optimization for agent context efficiency:
 
@@ -383,7 +383,7 @@ Reference file optimization for agent context efficiency:
   originals. No content or logic changes — purely structural optimization for
   progressive loading. Every reference file is now ≤ 300 lines.
 
-## 1.8.1
+## [1.8.1] - 2026-09-14
 
 Compliance with AgentSkills.io open standard:
 
@@ -394,7 +394,7 @@ Compliance with AgentSkills.io open standard:
 - Renamed `reference/` → `references/` (spec convention)
 - Fixed `name` field to match directory name
 
-## 1.8.0
+## [1.8.0] - 2026-09-13
 
 Coverage-gap pass: new checks (severities grounded in the EKS Best Practices
 Guide / AWS docs) plus cluster-type detection gates.
@@ -418,7 +418,7 @@ Guide / AWS docs) plus cluster-type detection gates.
   discovery scale tiers (Small/Medium/Large/XL), per-command
   timeout/webhook-blocking robustness, and events correlation.
 
-## 1.7.0
+## [1.7.0] - 2026-09-12
 
 Report structure factored out into the shared `operations-review-report-format`
 skill so it stays consistent across service reviews (EKS, ECS, …).
@@ -448,7 +448,7 @@ Also aligned with the shared `review-common` common-check baseline:
 - **SKILL.md** wires the crosswalk into the reference table, Step 7 grading, and the
   Step 8 coverage gate.
 
-## 1.6.0
+## [1.6.0] - 2026-09-11
 
 Full coverage pass so no check, finding, data source, or reference file is left
 out of the router or the workflow.
@@ -473,7 +473,7 @@ out of the router or the workflow.
 - **report-format §5** reinforced: exact check IDs, no renumber/drop; every graded
   pillar (incl. CP-series) gets its own scorecard.
 
-## 1.5.0
+## [1.5.0] - 2026-09-10
 
 Control Plane Health is now a MANDATORY, always-attempted pillar (fixes reviews
 that silently marked it N/A "pending query" even when logging was enabled).
@@ -494,7 +494,7 @@ that silently marked it N/A "pending query" even when logging was enabled).
   unavailable; attempt the calls and, on genuine error, report the actual error
   as evidence.
 
-## 1.4.3
+## [1.4.3] - 2026-09-09
 
 Tooling clarification so the agent stops aborting with "kubectl is not available."
 
@@ -508,7 +508,7 @@ Tooling clarification so the agent stops aborting with "kubectl is not available
 - Updated Inputs, Required access, Step 0, Step 3 (verify access), Step 4
   (discover), and the Non-goals "no shell" note to reference `use_kubectl`.
 
-## 1.4.2
+## [1.4.2] - 2026-09-08
 
 Repo-wide best-practices audit pass (every file read in full). All changes are
 wording/metadata; no change to grading logic.
@@ -536,7 +536,7 @@ wording/metadata; no change to grading logic.
 - **Removed `.DS_Store` junk** from the skill and `reference/` directories.
 - **Relabeled the `pillar-mapping.md` router columns** (`Pillar` → `Pillar / component`, `Pillar file` → `File`) so the AWS-API & Cluster Insights component row — long called a "component" everywhere else — isn't presented as a pillar.
 
-## 1.4.1
+## [1.4.1] - 2026-09-07
 
 Minor metadata / authoring-polish pass (no functional change to grading).
 
@@ -558,7 +558,7 @@ Minor metadata / authoring-polish pass (no functional change to grading).
   a listed capability provider … today" in favor of atemporal, verify-the-docs
   wording).
 
-## 1.4.0
+## [1.4.0] - 2026-09-06
 
 Restructured for full alignment with skill-authoring best practices (progressive
 disclosure / one-level-deep references / concision / consistent terminology).
@@ -586,7 +586,7 @@ disclosure / one-level-deep references / concision / consistent terminology).
   routing apply only to the optional continuous-monitoring mode.
 - Updated the README packaging file-tree comment to match the new layout.
 
-## 1.3.2
+## [1.3.2] - 2026-09-05
 
 - Closed the remaining minor / customer-specific CWR items: **N23** (LB
   target-group health checks), **N24** (NLB cross-zone load balancing), **R16**
@@ -595,14 +595,14 @@ disclosure / one-level-deep references / concision / consistent terminology).
   and **A23** (Fargate fit for spiky/low-density workloads) — each with a
   remediation-library block. Full 119-check CWR parity reached.
 
-## 1.3.1
+## [1.3.1] - 2026-09-04
 
 - Fixed audit gaps found against the CWR security checks: added **S28** (IMDSv2
   enforcement on nodes — also fixed a dangling `S-IMDSv2` reference in the Auto
   Mode skip table), **S29** (no `system:anonymous`/`system:unauthenticated` RBAC
   bindings), and **S30** (VPC flow logs), each with a remediation-library block.
 
-## 1.3.0
+## [1.3.0] - 2026-09-03
 
 Closed the gaps found against the UOPS `cwr-eks-assessment` skill (119 CWR checks).
 
@@ -623,7 +623,7 @@ Closed the gaps found against the UOPS `cwr-eks-assessment` skill (119 CWR check
 - `report-format.md`: added a **Recommended Alarms** deliverable for IDR/CWR reviews.
 - Added remediation-library blocks for N21, N22, P12, P13, S27, and O12–O21.
 
-## 1.2.0
+## [1.2.0] - 2026-09-02
 
 Closed the coverage gaps found against the awslabs eks-review MCP server.
 
@@ -649,7 +649,7 @@ Closed the coverage gaps found against the awslabs eks-review MCP server.
 - Added matching **remediation-library.md** blocks (why · steps · snippet ·
   links) for every new check: R15, S23–S26, U5b/U5c/U5d, and U15–U24.
 
-## 1.1.0
+## [1.1.0] - 2026-09-01
 
 - Added an evaluation harness (`.skilleval.yaml`, `evals/`) with routing
   queries and skill-knowledge evals plus a `cluster-context.json` fixture.
@@ -667,7 +667,7 @@ Closed the coverage gaps found against the awslabs eks-review MCP server.
 - Documented the Kubernetes API (MCP) as an optional structured alternative to
   the equivalent read-only `kubectl` calls. The read-only contract is unchanged.
 
-## 1.0.0
+## [1.0.0] - 2026-08-31
 
 - Initial version: two-phase (Discover → Review) end-to-end EKS operations
   review across nine pillars + an AWS-API & Cluster Insights component and a
