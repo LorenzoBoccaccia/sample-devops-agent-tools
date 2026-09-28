@@ -274,7 +274,14 @@ For the AWS-API checks (AX1–AX14) and CloudWatch (CP1–CP11, metrics-threshol
       "Effect": "Allow",
       "Action": [
         "iam:ListAttachedRolePolicies",
-        "iam:GetRolePolicy",
+        "iam:GetRolePolicy"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "IAMSimulateOptional",
+      "Effect": "Allow",
+      "Action": [
         "iam:SimulatePrincipalPolicy"
       ],
       "Resource": "*"
@@ -347,10 +354,12 @@ For the AWS-API checks (AX1–AX14) and CloudWatch (CP1–CP11, metrics-threshol
 
 > **Note:** `AmazonAIOpsAssistantPolicy` (the AWS-managed policy for DevOps Agent) covers most of
 > these. The IAM policy above is the minimum if you need a custom, least-privilege policy. The
-> Security Services (`SecurityServicesReadOnly`) and Service Quotas (`ServiceQuotasReadOnly`)
-> statements are **optional** — if not granted, the corresponding checks (S37–S39, U22–U24) are
-> graded N/A with the reason "IAM permission not available." The review proceeds normally without
-> them; they enhance coverage but are not prerequisites.
+> following statements are **optional** — if not granted, the corresponding checks degrade gracefully:
+> - `IAMSimulateOptional` (`iam:SimulatePrincipalPolicy`): Enhances controller IAM validation (AX9) with policy simulation. Without it, the skill falls back to `ListAttachedRolePolicies` + `GetRolePolicy` to read attached policies directly — same findings, slightly less authoritative.
+> - `SecurityServicesReadOnly`: Checks S37–S39 are graded N/A with "IAM permission not available."
+> - `ServiceQuotasReadOnly`: Checks U22–U24 are graded N/A with "IAM permission not available."
+>
+> The review proceeds normally without these optional permissions; they enhance coverage but are not prerequisites.
 
 ## Cross-account and scope restrictions
 
