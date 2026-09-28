@@ -4,6 +4,15 @@
 
 Full-repository inspection pass — every file read in full; all confirmed defects fixed.
 
+**Naming decision:** This skill is named `aws-eks-operations-review` rather than following the
+`<service>-operation-review` family pattern (`eks-operation-review`, `rds-operation-review`,
+`bedrock-operation-review`) for two reasons: (1) it represents a fundamentally different depth
+of review — 288 checks across 9 pillars with extensive telemetry correlation, versus the
+lightweight assessments the family provides — and (2) the `aws-` prefix and plural `-operations-`
+signal this distinction to both users and the agent's routing logic. The lightweight
+`eks-operation-review` skill is being removed in a separate PR; this skill supersedes it for
+comprehensive EKS operational assessments.
+
 **Core check count: 279 → 288.** The Control Plane pillar's CP-M1–CP-M6 (metric-native) and
 CPM1–CPM3 (manual) checks were defined in `pillars/control-plane.md` but orphaned from the
 canonical inventory — a compliant review grading the full pillar file produced 20 CP rows while
