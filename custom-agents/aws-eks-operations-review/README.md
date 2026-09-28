@@ -112,7 +112,7 @@ What each group is for:
 
 | Tool | Used for |
 |------|----------|
-| `get_skill_resource_manifest`, `get_skill_resource` | Loading the skill's references just-in-time, state by state. Required — the agent cannot start without these. |
+| `get_skill_resource_manifest`, `get_skill_resource` | Loading the skill's references just-in-time, state by state. Recommended for skills with reference files the agent should load contextually. |
 | `use_kubectl` | The 49 discovery areas, one command per call, read verbs only |
 | `use_aws` | EKS describe/list APIs, CloudWatch metrics, EC2 health, and the AWS API / Cluster Insights rows |
 | `query_cloudwatch_logs` | Control-plane Logs Insights queries (CP01–CP25) and log-pattern telemetry signals |

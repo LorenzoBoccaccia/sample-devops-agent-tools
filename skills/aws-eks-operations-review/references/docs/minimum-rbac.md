@@ -352,7 +352,7 @@ For the AWS-API checks (AX1–AX14) and CloudWatch (CP1–CP11, metrics-threshol
 }
 ```
 
-> **Note:** `AmazonAIOpsAssistantPolicy` (the AWS-managed policy for DevOps Agent) covers most of
+> **Note:** `AIDevOpsAgentAccessPolicy` (the AWS-managed IAM policy for DevOps Agent) covers most of
 > these. The IAM policy above is the minimum if you need a custom, least-privilege policy. The
 > following statements are **optional** — if not granted, the corresponding checks degrade gracefully:
 > - `IAMSimulateOptional` (`iam:SimulatePrincipalPolicy`): Enhances controller IAM validation (AX9) with policy simulation. Without it, the skill falls back to `ListAttachedRolePolicies` + `GetRolePolicy` to read attached policies directly — same findings, slightly less authoritative.
