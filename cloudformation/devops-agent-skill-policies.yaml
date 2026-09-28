@@ -20,6 +20,7 @@ Metadata:
           - EnableSupportCases
           - EnableRdsOperationReview
           - EnableEksOperationReview
+          - EnableEcsOperationReview
           - EnableInvestigationCostGuardrail
           - EnableEnrichWithSecurityAgent
           - EnableCrmInvestigationGuidelines
@@ -29,6 +30,7 @@ Metadata:
           - EnableDmsOperationReview
           - EnableAwsBackupCoverageReview
           - EnableAgentCoreObservabilitySetup
+          - EnableAgentCoreOpsReview
       - Label:
           default: Optional Resource Scoping
         Parameters:
@@ -68,6 +70,12 @@ Parameters:
   EnableEksOperationReview:
     Type: String
     Description: EKS Operation Review skill (covered by managed policy).
+    AllowedValues: ['true', 'false']
+    Default: 'true'
+
+  EnableEcsOperationReview:
+    Type: String
+    Description: ECS Operation Review skill (adds compute-optimizer:GetECSServiceRecommendations for the PERF8 rightsizing check).
     AllowedValues: ['true', 'false']
     Default: 'true'
 
@@ -127,17 +135,25 @@ Parameters:
     AllowedValues: ['true', 'false']
     Default: 'true'
 
+  EnableAgentCoreOpsReview:
+    Type: String
+    Description: AgentCore Operational Review skill (adds read-only bedrock-agentcore control-plane List/Get and ec2:DescribeSubnets for the multi-AZ check; observability-only mode needs none of these).
+    AllowedValues: ['true', 'false']
+    Default: 'true'
+
 Conditions:
   CreateNewRole: !Equals [!Ref ExistingRoleName, '']
   SkillAwsHealthEvents: !Equals [!Ref EnableAwsHealthEvents, 'true']
   SkillSupportCases: !Equals [!Ref EnableSupportCases, 'true']
   SkillRdsOperationReview: !Equals [!Ref EnableRdsOperationReview, 'true']
+  SkillEcsOperationReview: !Equals [!Ref EnableEcsOperationReview, 'true']
   SkillInvestigationCostGuardrail: !Equals [!Ref EnableInvestigationCostGuardrail, 'true']
   SkillMskOperations: !Equals [!Ref EnableMskOperations, 'true']
   SkillServiceQuotaCheck: !Equals [!Ref EnableServiceQuotaCheck, 'true']
   SkillDmsOperationReview: !Equals [!Ref EnableDmsOperationReview, 'true']
   SkillAwsBackupCoverageReview: !Equals [!Ref EnableAwsBackupCoverageReview, 'true']
   SkillAgentCoreObservabilitySetup: !Equals [!Ref EnableAgentCoreObservabilitySetup, 'true']
+  SkillAgentCoreOpsReview: !Equals [!Ref EnableAgentCoreOpsReview, 'true']
   HasRegionRestriction: !Not [!Equals [!Join ['', !Ref AllowedRegions], '']]
 
 Resources:
@@ -236,6 +252,24 @@ Resources:
             Effect: Allow
             Action:
               - logs:GetLogEvents
+            Resource: '*'
+
+  # ecs-operation-review: adds compute-optimizer:GetECSServiceRecommendations (PERF8 rightsizing);
+  # every other API the skill uses is covered by AIDevOpsAgentAccessPolicy
+  PolicyEcsOperationReview:
+    Type: AWS::IAM::Policy
+    Condition: SkillEcsOperationReview
+    Properties:
+      PolicyName: DevOpsAgentSkill-EcsOperationReview
+      Roles:
+        - !If [CreateNewRole, !Ref DevOpsAgentRole, !Ref ExistingRoleName]
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ComputeOptimizerEcsRecommendations
+            Effect: Allow
+            Action:
+              - compute-optimizer:GetECSServiceRecommendations
             Resource: '*'
 
   # investigation-cost-guardrail: adds pricing:GetProducts
@@ -390,6 +424,54 @@ Resources:
               - ecs:ListTasks
               - eks:DescribeCluster
             Resource: '*'
+  
+  # agentcore-ops-review: adds read-only bedrock-agentcore control-plane (runtime,
+  # memory, gateway, browser, code-interpreter, workload-identity inventory) plus
+  # ec2:DescribeSubnets for the single-AZ runtime check (AC-RUN-2). CloudWatch metric,
+  # Cost Explorer, and Health reads used by the skill are covered by AIDevOpsAgentAccessPolicy.
+  # Observability-only mode requires none of these — it runs on the base policy alone.
+  PolicyAgentCoreOpsReview:
+    Type: AWS::IAM::Policy
+    Condition: SkillAgentCoreOpsReview
+    Properties:
+      PolicyName: DevOpsAgentSkill-AgentCoreOpsReview
+      Roles:
+        - !If [CreateNewRole, !Ref DevOpsAgentRole, !Ref ExistingRoleName]
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AgentCoreOpsReviewControlPlaneRead
+            Effect: Allow
+            Action:
+              - bedrock-agentcore:ListAgentRuntimes
+              - bedrock-agentcore:GetAgentRuntime
+              - bedrock-agentcore:ListAgentRuntimeEndpoints
+              - bedrock-agentcore:ListAgentRuntimeVersions
+              - bedrock-agentcore:ListMemories
+              - bedrock-agentcore:GetMemory
+              - bedrock-agentcore:ListGateways
+              - bedrock-agentcore:GetGateway
+              - bedrock-agentcore:ListGatewayTargets
+              - bedrock-agentcore:GetGatewayTarget
+              - bedrock-agentcore:ListBrowsers
+              - bedrock-agentcore:ListCodeInterpreters
+              - bedrock-agentcore:ListWorkloadIdentities
+            Resource: '*'
+          # Data-plane: used ONLY to count long-term memory records (AC-MEM-2).
+          # The response can include PII-bearing memory `content`; the skill reads
+          # only the count and never parses/stores/reproduces `content`. Omit this
+          # statement for zero data-plane access — AC-MEM-2 degrades to a visibility
+          # limit and all other memory checks (CloudWatch metrics) still work.
+          - Sid: AgentCoreOpsReviewMemoryRecordCount
+            Effect: Allow
+            Action:
+              - bedrock-agentcore:ListMemoryRecords
+            Resource: '*'
+          - Sid: AgentCoreOpsReviewSubnetAZResolution
+            Effect: Allow
+            Action:
+              - ec2:DescribeSubnets
+            Resource: '*'
 
   # Optional: restrict agent to specific regions
   PolicyRegionalRestriction:
@@ -434,12 +516,14 @@ Outputs:
         - aws-health-events: ${EnableAwsHealthEvents} (health:DescribeEventTypes)
         - support-cases: ${EnableSupportCases} (support:DescribeCommunications)
         - rds-operation-review: ${EnableRdsOperationReview} (rds:DownloadDBLogFilePortion, logs:GetLogEvents)
+        - ecs-operation-review: ${EnableEcsOperationReview} (compute-optimizer:GetECSServiceRecommendations)
         - investigation-cost-guardrail: ${EnableInvestigationCostGuardrail} (pricing:GetProducts)
         - msk-operations: ${EnableMskOperations} (kafka:GetBootstrapBrokers)
         - service-quota-check: ${EnableServiceQuotaCheck} (servicequotas:*, cloudwatch:GetMetricData/GetMetricStatistics)
         - database-migration-service-expertise: ${EnableDmsOperationReview} (dms:TestConnection)
         - aws-backup-coverage-review: ${EnableAwsBackupCoverageReview} (backup:GetSupportedResourceTypes, config:SelectResourceConfig, dsql:ListClusters, storagegateway:List*)
         - agentcore-observability-setup: ${EnableAgentCoreObservabilitySetup} (bedrock-agentcore:Get/ListAgentRuntime, xray:GetTraceSegmentDestination, logs:DescribeDeliveries/DeliverySources/DeliveryDestinations/ResourcePolicies, lambda:GetFunctionConfiguration, ecs:DescribeTaskDefinition/DescribeServices/ListTasks, eks:DescribeCluster)
+        - agentcore-ops-review: ${EnableAgentCoreOpsReview} (bedrock-agentcore read-only List/Get for runtimes/memories/gateways/browsers/code-interpreters/workload-identities, ec2:DescribeSubnets)
       Skills covered by AIDevOpsAgentAccessPolicy (no extra policy needed):
         - eks-operation-review, enrich-with-aws-security-agent, crm-production-investigation-guidelines
       No IAM required:
