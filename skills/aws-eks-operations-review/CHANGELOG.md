@@ -176,13 +176,12 @@ query fixes, RBAC documentation, decision trees, and new checks closing coverage
   storms, etcd pressure, genuine capacity).
 - **New `references/decision-trees/oomkilled.md`:** 7-branch decision tree for OOMKilled
   (limit too low, burst, actual leak, sidecar, node pressure, storage eviction, runtime/JVM).
-- **`SKILL.md` frontmatter:** Updated description to add deconfliction ("Do not use for a quick
-  point-in-time health snapshot without grading — use aws-eks-healthdashboard instead").
+- **`SKILL.md` frontmatter:** Updated description to add scope guidance ("This skill performs comprehensive graded operational reviews; for quick health checks during active incidents, use incident investigation skills instead").
 - **`SKILL.md` — new "When NOT to use" section:** Explicit negative activation guidance
-  (quick health check → healthdashboard, incident investigation → investigation skills,
+  (quick health check → incident investigation skills, incident investigation → investigation skills,
   continuous monitoring → alerting, cluster mutation → out of scope).
-- **`evals/eval_queries.json`:** Added 3 negative routing queries that should trigger the
-  healthdashboard, not this skill.
+- **`evals/eval_queries.json`:** Added 3 negative routing queries that should trigger
+  incident investigation skills, not this skill.
 - **`SKILL.md` reference table:** Added entries for `minimum-rbac.md`,
   `false-positive-controls.md`, and `decision-trees/`.
 
@@ -205,7 +204,7 @@ all 16 new check-ID rows.
 
 ## 1.8.11
 
-Parity with `aws-eks-healthdashboard`: add CloudWatch Logs Insights queries CP19–CP25 to
+Add CloudWatch Logs Insights queries CP19–CP25 to
 `control-plane-health/queries.md` (+ threshold lines in `control-plane-health/thresholds.md`),
 closing gaps found against the EKS audit-log query cookbook (re:Post control-plane-logs, EKS
 Auditing & Logging best practices, GuardDuty guidance):

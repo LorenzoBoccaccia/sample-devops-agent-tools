@@ -18,7 +18,7 @@ metadata:
 ---
 # EKS Operations Review
 ## Scope boundary
-For a quick health snapshot without grading, use `aws-eks-healthdashboard` instead.
+This skill performs comprehensive graded operational reviews with 288 checks across 9 pillars. For quick health checks during active incidents, use incident investigation skills instead — this review is heavyweight and best suited for proactive assessments.
 ## Execution scope
 A full review is heavyweight and may require many read-only tool calls; duration varies with cluster size, API responsiveness, permissions, and telemetry availability. A targeted review grades only the named unit plus required AX evidence. The 49 discovery areas collect evidence; the 288 core rows are grading items across nine pillars plus AWS API/Insights. Some areas serve multiple checks or no direct check. Per-unit counts and exact ID membership live in `references/runtime/check-manifest.md`; read them there each run.
 
