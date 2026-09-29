@@ -8,20 +8,6 @@ This custom agent is an orchestrator for the [`aws-eks-operations-review`](https
 
 The multi-artifact split is the agent's central design decision. A full review spans 49 discovery areas and roughly 288 graded rows, and assembling that into one cumulative artifact means many sequential `create_or_update_artifact` calls whose payload grows with each call — the failure mode that produces render stalls and half-written reports. Splitting by pillar keeps each artifact small enough that most complete in one or two calls, makes every completed pillar a standalone deliverable, and removes cross-pillar accumulation risk entirely.
 
-### Relationship to aws-operation-review
-
-This agent (`aws-eks-operations-review`) is **not** the same as [`aws-operation-review`](../aws-operation-review/). The two serve different purposes and require different tools:
-
-| Aspect | `aws-operation-review` | `aws-eks-operations-review` |
-|--------|------------------------|----------------------------|
-| **Scope** | Multi-service (EKS + RDS) | EKS-only |
-| **Skills** | `eks-operation-review` + `rds-operation-review` | `aws-eks-operations-review` |
-| **Depth** | Lightweight quick assessments | Deep — 288 checks across 9 pillars, 49 discovery areas |
-| **Tools** | `use_aws`, `use_kubectl` | Extensive: `use_aws`, `use_kubectl`, `query_cloudwatch_logs`, `create_or_update_artifact`, `list_artifacts`, `verify_aws_claim`, `lookup_cloudtrail_events`, topology tools, X-Ray trace tools, Trusted Advisor tools, skill resource tools |
-| **Output** | Single artifact | Multiple artifacts (Summary + one per pillar) |
-
-Use `aws-operation-review` when you need a quick operational health check across multiple services. Use `aws-eks-operations-review` when you need a comprehensive, Well-Architected-style deep-dive into a single EKS cluster with extensive telemetry correlation and remediation guidance.
-
 ## Key Capabilities
 
 - Grades one EKS cluster across nine pillars — Operations, Resilience, Security, Scalability, Performance, Observability, Networking, Cost, Control Plane — plus AWS API and Cluster Insights rows
