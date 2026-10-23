@@ -178,7 +178,7 @@ A pull request check ([`.github/workflows/validate-skill-evals.yml`](.github/wor
 
 | Required | |
 | --- | --- |
-| `evals/evals.json` | must exist |
+| `evals/evals.json` | must exist, except for a partner-managed skill (see "When a test type can't be run") |
 | `evals/structure/` | at least one `structure-tests-results-v<N>.json` |
 | `evals/best-practices/` | at least one **complete** `v<N>/`: `benchmark.json` **and** an `iteration-<n>/best-practices-tests-results.json` |
 | `evals/functional/` | at least one **complete** `v<N>/`: `benchmark.json`, `evals.json`, **and** an `iteration-<n>/<scenario-name>/` directory holding both `with_skill/functional-tests-results.json` and `without_skill/functional-tests-results.json` |
@@ -215,7 +215,19 @@ Some skills genuinely can't produce results for one of the test types. The two c
 }
 ```
 
-The exempted test type is then not checked. It's reported as a warning instead, so the check goes green while still showing what's missing and why. Keys are `structure`, `best-practices`, and `functional`; `evals.json` is hand-written rather than tool output, so it can't be exempted.
+The exempted test type is then not checked. It's reported as a warning instead, so the check goes green while still showing what's missing and why. Keys are `structure`, `best-practices`, and `functional`; `evals.json` is hand-written rather than tool output, so it can't be exempted, except for a partner-managed skill, below.
+
+**Partner-managed skills.** A skill whose `SKILL.md` sets `metadata.tier: "partner-managed"` needs no `evals/evals.json`. It commits an `evals/exemptions.json` with this reason for all three test types:
+
+```json
+{
+  "structure":      { "reason": "Partner-managed skill: skill evaluation tool results aren't produced for partner-managed skills." },
+  "best-practices": { "reason": "Partner-managed skill: skill evaluation tool results aren't produced for partner-managed skills." },
+  "functional":     { "reason": "Partner-managed skill: skill evaluation tool results aren't produced for partner-managed skills." }
+}
+```
+
+This is the standing agreement for partner-managed skills, so it needs no separate sign-off from a maintainer, and the pull request doesn't need the manual testing evidence described below: the partner tests its skill, and a maintainer checks that it installs and loads before the connector that recommends it is promoted. The `enforce-evals` label still withdraws the exemption, and then `evals.json` is required too.
 
 Write a reason that explains the blocker and what *was* run — a future maintainer needs to know whether to revisit it. If the exemption is temporary, such as an agent type the tool will support later, say so, so it gets removed when the limitation goes away.
 
