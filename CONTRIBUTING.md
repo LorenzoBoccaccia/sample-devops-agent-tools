@@ -178,7 +178,7 @@ A pull request check ([`.github/workflows/validate-skill-evals.yml`](.github/wor
 
 | Required | |
 | --- | --- |
-| `evals/evals.json` | must exist, except for a partner-managed skill (see "When a test type can't be run") |
+| `evals/evals.json` | must exist, unless the `functional` results are exempted (see "When a test type can't be run") |
 | `evals/structure/` | at least one `structure-tests-results-v<N>.json` |
 | `evals/best-practices/` | at least one **complete** `v<N>/`: `benchmark.json` **and** an `iteration-<n>/best-practices-tests-results.json` |
 | `evals/functional/` | at least one **complete** `v<N>/`: `benchmark.json`, `evals.json`, **and** an `iteration-<n>/<scenario-name>/` directory holding both `with_skill/functional-tests-results.json` and `without_skill/functional-tests-results.json` |
@@ -215,9 +215,11 @@ Some skills genuinely can't produce results for one of the test types. The two c
 }
 ```
 
-The exempted test type is then not checked. It's reported as a warning instead, so the check goes green while still showing what's missing and why. Keys are `structure`, `best-practices`, and `functional`; `evals.json` is hand-written rather than tool output, so it can't be exempted, except for a partner-managed skill, below.
+The exempted test type is then not checked. It's reported as a warning instead, so the check goes green while still showing what's missing and why. Keys are `structure`, `best-practices`, and `functional`.
 
-**Partner-managed skills.** A skill whose `SKILL.md` sets `metadata.tier: "partner-managed"` needs no `evals/evals.json`. It commits an `evals/exemptions.json` with this reason for all three test types:
+`evals.json` isn't one of the keys, because you write it rather than the tool. It's the input to the functional tests, though — the tool reads it for that run, and the scenario directories a functional run writes are named from it — so exempting `functional` waives `evals.json` too. There's no run left for it to feed, and the check never reads the file, so requiring it would only ask for eval definitions nobody is going to execute. Exempting `structure` or `best-practices` doesn't waive it: those runs don't read it. If you've already written your definitions, commit them anyway — a maintainer running the tool later starts from them.
+
+**Partner-managed skills.** A skill whose `SKILL.md` sets `metadata.tier: "partner-managed"` commits an `evals/exemptions.json` with this reason for all three test types, which waives `evals/evals.json` along with the results, per the rule above:
 
 ```json
 {
