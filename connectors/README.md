@@ -9,4 +9,6 @@ A connector is the definition of an MCP server that a partner hosts, for custome
 | `schema/v1/published-files.json` | The files a connector directory may contain. Every one is published |
 | `releases.yaml` | Per connector, the version production serves. Changed by maintainers only |
 
+`maintainers` in `connector.yaml` lists the GitHub usernames, or teams as `org/team`, that maintain the connector, without a leading `@`.
+
 Connector submissions are not open yet. The contribution guide, covering how to write and submit a connector, will be added to [CONTRIBUTING.md](../CONTRIBUTING.md).
