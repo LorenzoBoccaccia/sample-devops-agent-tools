@@ -12,6 +12,11 @@
 /.gitattributes @aws/tools-for-devops-agent-admins
 /tests/ @aws/tools-for-devops-agent-admins
 
+# Connector definitions and connectors/releases.yaml, the version production
+# serves. Until the repository has a team for connector maintainers, the admins
+# own them.
+/connectors/ @aws/tools-for-devops-agent-admins
+
 # Skills are deliberately NOT owned yet.
 #
 # Ownership of /skills/ was for publishing review: skills on main are published
@@ -36,8 +41,3 @@
 # notifying. Un-comment the line below and say so in the pull request.
 #
 # /skills/ @aws/tools-for-devops-agent-admins
-
-# Connector definitions and connectors/releases.yaml, the version production
-# serves. Until the repository has a team for connector maintainers, the admins
-# own them.
-/connectors/ @aws/tools-for-devops-agent-admins
