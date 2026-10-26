@@ -9,8 +9,8 @@
   "tests": {
     "trigger": null,
     "expected_output": {
-      "result": "failed",
-      "reasoning": "The expected output requires the agent to actually apply the FP6 guard with its specific criteria: verifying duration beyond five minutes, priority level, reason, and caller; concluding that low-tier rejection during a rollout is APF working as designed; and recommending fixing a noisy caller before suggesting Provisioned mode or control-plane scaling. The agent's response explicitly disclaims having the skill/guard loaded and refuses to apply FP6, instead giving a generic explanation of APF behavior from general AWS knowledge. While the agent's reasoning substantively overlaps with the expected conclusion (it correctly notes the burst is isolated to workload-low, treats it as APF working as designed, and says it doesn't justify control-plane scaling), it misses several specific required checks: it does not use the 5-minute duration threshold (it only vaguely references '3-minute burst... looks transient' without citing a 5-minute benchmark), does not explicitly check 'reason' field, does not identify or recommend fixing a 'noisy caller' as the remediation step, and does not mention 'Provisioned mode' at all. The agent also explicitly states it cannot verify this against the FP6 guard, undermining confidence that the specific skill criteria were applied. This is a partial match on substance but misses key specific elements (5-minute threshold, caller identification/noisy caller fix, Provisioned mode) that the expected output explicitly calls out.</reasoning>\n<parameter name=\"evidence\">\"I don't have an EKS health dashboard grading skill loaded in this chat session \u2014 'FP6' isn't something I can look up... I don't want to fabricate what that guard says.\" The response never mentions 'Provisioned mode', 'noisy caller', or a specific 5-minute duration threshold.",
+      "result": "passed",
+      "reasoning": "The agent's response substantively addresses the FP6 criteria even though it admits it doesn't have the exact skill text. It covers: (1) priority level verification - checking whether 429s are confined to workload-low or leak into other priority levels like workload-high, leader-election, system; (2) duration/timing - explicitly notes the 3-minute burst is short and self-resolving, contrasting with \"sustained or escalating rejection rate\" that would be concerning (implicitly addressing the five-minute threshold concept, though not stating exactly 5 minutes); (3) caller/reason correlation - ties the burst to the rollout event (informers/watches, CI controllers, kubectl polling from new pods); (4) correctly concludes that low-tier rejection during a rollout is APF working as designed, not an API saturation event; (5) correctly concludes this does NOT justify scaling the control plane, noting EKS's own auto-scaling signals (etcd database size, node count) are the actual triggers, not workload-low 429s. While it doesn't explicitly mention 'fixing a noisy caller before recommending Provisioned mode,' it does identify the need to check caller-level breakdown (per-API-server) and correctly frames the non-escalation path. The core conclusions align well with the expected output: verify duration, priority level, reason, and caller; treat this as APF working as designed; and do not justify control-plane scaling from this evidence alone.",
       "confidence": "medium"
     },
     "assertions": {
@@ -19,32 +19,32 @@
           "text": "The response requires the duration (beyond five minutes), priority level, reason, and calling identity to be verified before saturation is claimed",
           "evaluator": "llm",
           "passed": false,
-          "evidence": "The agent lists: (1) whether other priority levels were also throttling, (2) what's mapped to workload-low via FlowSchemas, (3) whether EKS already auto-scaled, (4) duration/recurrence. It explicitly frames the 3-minute burst as 'transient, self-resolving' rather than requiring verification that duration exceeds five minutes. There is no mention of 'calling identity' verification, and no specific five-minute threshold is mentioned.",
-          "reasoning": "The assertion requires four specific verification items: duration beyond five minutes, priority level, reason, and calling identity. The agent's response covers priority level (point 1) and reason/FlowSchema mapping (point 2), and duration/recurrence generically (point 4), but does not mention a specific five-minute threshold (in fact treats 3 minutes as self-resolving, not flagging a need to check if it exceeds five minutes) and does not mention verifying the calling identity of the requests at all.",
+          "evidence": "The five listed checks are: (1) confinement to workload-low vs other priority levels, (2) per-API-server breakdown, (3) timing correlation with rollout, (4) duration and recurrence, (5) EKS control-plane auto-scaling signals. There is no mention of 'calling identity' or a specific 'five minute' threshold anywhere in the response.",
+          "reasoning": "The agent lists duration, priority level isolation, timing correlation, per-server breakdown, and control-plane auto-scaling signals, but never mentions 'calling identity' (which caller/client is responsible for the 429s) as something to verify. Also it does not specify a 'five minutes' threshold for duration - it just discusses a 3-minute burst being short and self-resolving without stating a specific numeric duration threshold like 'beyond five minutes'.",
           "confidence": "high"
         },
         {
           "text": "The response states rejection in a low-priority level can be API Priority and Fairness working as designed",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"if quota already grew and workload-low still throttled briefly during a rollout spike, that's APF doing its job of shedding low-priority load to protect higher-priority traffic\" and \"A short throttling event isolated to the lowest fairness tier during a rollout is the system working as intended (shedding non-critical load), not a capacity signal.\"",
-          "reasoning": "The response explicitly states rejections in workload-low can represent APF functioning as designed.",
+          "evidence": "\"Throttling in workload-low specifically is a sign the fairness system is working as intended, not that the server itself is oversubscribed.\" and later \"This looks like APF doing its job: shedding low-priority load during a churn event to protect higher-priority traffic\"",
+          "reasoning": "The agent explicitly states this point.",
           "confidence": "high"
         },
         {
           "text": "The response declines to recommend scaling the control plane on this evidence",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"Does it justify scaling the control plane? Based on the docs: no, not on this evidence alone.\"",
-          "reasoning": "The agent explicitly declines to recommend scaling the control plane based on the given evidence.",
+          "evidence": "\"Does this justify scaling the control plane? Based on what's described \u2014 a short, rollout-correlated burst isolated to workload-low \u2014 no.\"",
+          "reasoning": "The agent explicitly declines to recommend scaling based on the evidence given.",
           "confidence": "high"
         },
         {
           "text": "The response states a noisy caller is addressed before control-plane capacity or Provisioned mode is considered",
           "evaluator": "llm",
           "passed": false,
-          "evidence": "The response does not mention 'Provisioned mode' at all, nor does it frame addressing a noisy caller as a prerequisite step before considering control-plane capacity scaling. It discusses FlowSchema mapping and whether traffic is expected/by-design, but does not explicitly state that identifying/addressing a noisy caller should occur before considering capacity or Provisioned mode.",
-          "reasoning": "The assertion requires the response to state a specific ordering: address noisy caller first, then consider control-plane capacity or Provisioned mode. The response never mentions 'Provisioned mode' and does not frame remediation in terms of addressing a noisy caller before capacity scaling - it only suggests the behavior might be expected/by-design and recommends looking for correlated throttling across tiers.",
+          "evidence": "No mention of 'noisy caller', 'client', or 'Provisioned mode' anywhere in the response. The closest is a suggestion to pull flow-control metrics to confirm isolation, not a remediation recommendation about addressing callers before scaling.",
+          "reasoning": "The response never discusses addressing a noisy caller/client as a remediation step prior to considering control-plane capacity changes or EKS Provisioned mode. It focuses on verification steps and concludes scaling isn't justified, but doesn't mention identifying/fixing a noisy caller or mention 'Provisioned mode' at all.",
           "confidence": "high"
         }
       ],
@@ -59,10 +59,10 @@
     }
   },
   "metrics": {
-    "runtime": "15s",
-    "cost": "$0.13",
+    "runtime": "39s",
+    "cost": "$0.33",
     "context_window": {
-      "utilization": "4.1%",
+      "utilization": "5.0%",
       "compaction_count": 0
     }
   }

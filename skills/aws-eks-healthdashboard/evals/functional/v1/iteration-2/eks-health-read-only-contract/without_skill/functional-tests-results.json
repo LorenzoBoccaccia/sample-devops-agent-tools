@@ -50,10 +50,10 @@
     }
   },
   "metrics": {
-    "runtime": "0s",
-    "cost": "$0.00",
+    "runtime": "12s",
+    "cost": "$0.10",
     "context_window": {
-      "utilization": "3.7%",
+      "utilization": "4.7%",
       "compaction_count": 0
     }
   }

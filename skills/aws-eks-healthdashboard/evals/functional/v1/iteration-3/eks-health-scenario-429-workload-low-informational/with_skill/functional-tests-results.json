@@ -14,8 +14,8 @@
     },
     "expected_output": {
       "result": "passed",
-      "reasoning": "The agent's response correctly applies FP6 by verifying: (1) duration beyond five minutes (noting the 3-min burst fails this threshold), (2) priority level (workload-low identified), (3) reason (needs specific APF rejection reason), and (4) caller (identify who was issuing rejected requests). It explicitly treats the low-tier rejection during a rollout as 'APF working as designed' rather than true saturation. It concludes that scaling the control plane is NOT justified and that a noisy caller should be fixed first before recommending Provisioned mode or control-plane scaling. This matches all elements of the expected output.",
-      "evidence": "\"Duration > 5 minutes \u2014 your burst is 3 minutes, so it already fails this threshold... Priority level \u2014 you have this: workload-low... The reason... The caller... It's isolated to workload-low \u2014 EKS/APF is designed to shed load from low-priority levels first precisely to protect higher-priority traffic. This is very plausibly APF working as designed... The guard requires you to fix a noisy caller first before recommending something like Provisioned/scaled control plane mode.\"",
+      "reasoning": "The agent's response explicitly applies FP6, lists verification of duration (>5 min), priority level, reason, and caller - matching all four required checks. It correctly notes the 3-minute burst fails the duration threshold, treats the low-tier (workload-low) rejection during a rollout as APF working as designed, and concludes that fixing a noisy caller should be done before recommending Provisioned mode or control-plane scaling. This aligns closely with all elements of the expected output.",
+      "evidence": "\"Duration > 5 minutes \u2014 your burst is only ~3 minutes... Priority level... Caller... this pattern is much more consistent with APF working as designed... fix a noisy caller before recommending Provisioned mode (or any control-plane scaling).\"",
       "confidence": "high"
     },
     "assertions": {
@@ -24,32 +24,32 @@
           "text": "The response requires the duration (beyond five minutes), priority level, reason, and calling identity to be verified before saturation is claimed",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response lists four items to verify: 'Duration > 5 minutes', 'Priority level', 'The reason', and 'The caller' - matching duration, priority level, reason, and calling identity.",
-          "reasoning": "The response explicitly enumerates all four required verification items before calling it saturation.",
+          "evidence": "The response lists: '1. Duration > 5 minutes \u2014 your burst is only ~3 minutes...' '2. Priority level \u2014 confirm which APF priority level absorbed the rejections.' '3. reason \u2014 pull the rejection reason from the APF/audit signal' '4. Caller \u2014 identify which client/controller/user-agent was issuing the throttled requests'",
+          "reasoning": "All four required verification items (duration >5min, priority level, reason, calling identity/caller) are explicitly enumerated before concluding saturation.",
           "confidence": "high"
         },
         {
           "text": "The response states rejection in a low-priority level can be API Priority and Fairness working as designed",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response states: 'EKS/APF is designed to shed load from low-priority levels first precisely to protect higher-priority traffic. This is very plausibly APF working as designed during a rollout-induced burst, not the control plane running out of capacity.'",
-          "reasoning": "This directly matches the assertion that rejection in a low-priority level can be APF working as designed.",
+          "evidence": "The response states: 'this pattern is much more consistent with APF working as designed \u2014 deprioritizing low-priority traffic to protect the higher-priority levels' and quotes the guard: \"low-tier rejection may be APF working as designed\"",
+          "reasoning": "Explicitly states that low-priority rejection may represent APF working as designed, matching the assertion.",
           "confidence": "high"
         },
         {
           "text": "The response declines to recommend scaling the control plane on this evidence",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response states: 'Does this justify scaling the control plane? No. Based on the evidence given, FP6 explicitly blocks that conclusion.'",
-          "reasoning": "The response explicitly and clearly declines to recommend scaling the control plane based on the given evidence.",
+          "evidence": "The response states: 'Does this justify scaling the control plane? No.' and later 'not a capacity/scaling action on the control plane itself.'",
+          "reasoning": "The agent clearly declines to recommend scaling the control plane based on this evidence.",
           "confidence": "high"
         },
         {
           "text": "The response states a noisy caller is addressed before control-plane capacity or Provisioned mode is considered",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response states: 'The guard requires you to fix a noisy caller first before recommending something like Provisioned/scaled control plane mode.' and 'the finding should point at identifying/throttling the noisy caller from the rollout rather than recommending control-plane scaling.'",
-          "reasoning": "The response explicitly states that addressing the noisy caller should come before considering control-plane capacity scaling or Provisioned mode.",
+          "evidence": "The response states: 'says to fix a noisy caller before recommending Provisioned mode (or any control-plane scaling)' and 'identify the noisy caller behind the rollout... check if it needs backoff/rate-limiting or a priority-level reassignment \u2014 not a capacity/scaling action on the control plane itself.'",
+          "reasoning": "Explicitly states that addressing the noisy caller should precede control-plane capacity actions or Provisioned mode changes.",
           "confidence": "high"
         }
       ],
@@ -64,8 +64,8 @@
     }
   },
   "metrics": {
-    "runtime": "15s",
-    "cost": "$0.13",
+    "runtime": "12s",
+    "cost": "$0.10",
     "context_window": {
       "utilization": "4.8%",
       "compaction_count": 0

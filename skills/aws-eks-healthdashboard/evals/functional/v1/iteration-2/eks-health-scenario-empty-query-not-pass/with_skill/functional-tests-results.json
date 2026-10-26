@@ -14,8 +14,8 @@
     },
     "expected_output": {
       "result": "passed",
-      "reasoning": "The agent correctly states that zero rows cannot be automatically graded PASS and is 'unknown' until verified, citing the FP11 guard. It lists all four required verifications matching the expected criteria: (1) control-plane logging enabled, (2) log group/audit stream existence, (3) delivery delay consideration, (4) correct query window/filter. It also correctly notes that failing these checks results in N/A or FAIL rather than a silent pass, aligning with the expected output.",
-      "evidence": "\"a zero-row result **can** eventually be graded \u2705 PASS, but only after you've confirmed all four of the following; until then it's *unknown*, not healthy: 1. Control-plane logging is enabled... 2. The log group/stream actually exists... 3. No delivery delay is in play... 4. The query window and filter are correct...\"",
+      "reasoning": "The agent correctly states that zero rows cannot be auto-graded PASS, citing FP11/empty-result rule, and lists exactly the four required verifications: (1) control-plane logging enabled, (2) log group/audit stream exist, (3) delivery delay accounted for, (4) query window and filter correct. This matches the expected output criteria precisely, with additional useful nuance that doesn't contradict the expectation.",
+      "evidence": "\"no \u2014 a zero-row Logs Insights result for a control-plane check must never be auto-graded PASS... Before an empty result can mean anything, you must verify all four of these: 1. Control-plane logging is actually enabled... 2. The log group exists and has a live stream... 3. Delivery delay is accounted for... 4. The query window and filter are correct...\"",
       "confidence": "high"
     },
     "assertions": {
@@ -23,48 +23,48 @@
         {
           "text": "The response states a zero-row query result may not be graded PASS",
           "evaluator": "llm",
-          "passed": false,
-          "evidence": "The response says: 'a zero-row result **can** eventually be graded \u2705 PASS, but only after you've confirmed all four of the following' \u2014 this directly contradicts the assertion that the response states it may NOT be graded PASS.",
-          "reasoning": "The assertion claims the response states a zero-row result may NOT be graded PASS. However, the response explicitly states the opposite.",
+          "passed": true,
+          "evidence": "\"no \u2014 a zero-row Logs Insights result for a control-plane check must never be auto-graded PASS.\"",
+          "reasoning": "The response explicitly states that a zero-row result cannot be graded PASS.",
           "confidence": "high"
         },
         {
           "text": "The response states an empty result is unknown rather than healthy until verified",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response states: 'until then it's *unknown*, not healthy'",
-          "reasoning": "The response explicitly states the empty result is unknown, not healthy, until the four conditions are verified.",
+          "evidence": "\"Zero rows is *unknown* until proven otherwise, not evidence of health.\"",
+          "reasoning": "The response explicitly frames the empty result as unknown status, not healthy, until verification occurs.",
           "confidence": "high"
         },
         {
           "text": "The response names verifying logging enablement, the log group/stream existence, delivery delay, and the query window/filter",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response lists: '1. Control-plane logging is enabled... 2. The log group/stream actually exists... 3. No delivery delay is in play... 4. The query window and filter are correct'",
-          "reasoning": "The response lists all four required verifications matching the assertion's description.",
+          "evidence": "The response lists: (1) \"Control-plane logging is actually enabled\", (2) \"The log group exists and has a live stream\", (3) \"Delivery delay is accounted for\", (4) \"The query window and filter are correct\"",
+          "reasoning": "All four required verification items are explicitly named and match the assertion's description: logging enablement, log group/stream existence, delivery delay, and query window/filter correctness.",
           "confidence": "high"
         },
         {
           "text": "The response states the same rule applies to GetMetricData returning no datapoints for a CP-M check",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response states: 'The same logic applies to `GetMetricData` returning no datapoints for the CP-M metric-native checks.'",
-          "reasoning": "The response explicitly extends the same logic to GetMetricData returning no datapoints for CP-M checks.",
+          "evidence": "\"The same logic extends to `GetMetricData` returning no datapoints for the CP-M metric-native checks.\"",
+          "reasoning": "The response explicitly states the same rule/logic applies to GetMetricData with no datapoints for CP-M checks.",
           "confidence": "high"
         }
       ],
       "summary": {
-        "passed": 3,
-        "failed": 1,
+        "passed": 4,
+        "failed": 0,
         "errored": 0,
         "low_confidence": 0,
         "total": 4,
-        "pass_rate": 0.75
+        "pass_rate": 1.0
       }
     }
   },
   "metrics": {
-    "runtime": "11s",
+    "runtime": "10s",
     "cost": "$0.09",
     "context_window": {
       "utilization": "4.8%",

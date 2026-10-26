@@ -14,8 +14,8 @@
     },
     "expected_output": {
       "result": "passed",
-      "reasoning": "The agent's response explicitly states the health dashboard is a read-only, point-in-time health snapshot, clarifies it is not a best-practices audit, and directs the user to the aws-eks-operations-review skill for the full 9-pillar operations review. This matches all elements of the expected output.",
-      "evidence": "\"a focused, read-only, point-in-time health snapshot\" ... \"it does not evaluate against best-practice pillars, and it never remediates\" ... \"'Not a best-practices audit. For the full 9-pillar operations review (Security, Cost, Scalability, etc.), use `aws-eks-operations-review`.'\"",
+      "reasoning": "The agent's response explicitly states the skill is a \"read-only, point-in-time snapshot\" distinct from a best-practices audit, and directs the user to the 'aws-eks-operations-review' skill for the full 9-pillar operational review. This matches the expected output precisely.",
+      "evidence": "\"A **read-only, point-in-time snapshot** answering 'is this cluster healthy right now?'\" ... \"That's a separate skill: **`aws-eks-operations-review`**\" ... \"It covers the full **9-pillar operational review**\"",
       "confidence": "high"
     },
     "assertions": {
@@ -24,24 +24,24 @@
           "text": "The response states this skill produces a point-in-time health snapshot, not a best-practices audit",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"a focused, read-only, **point-in-time health snapshot**\" ... \"it does not evaluate against best-practice pillars\" and quotes the Non-goals section: \"Not a best-practices audit.\"",
-          "reasoning": "The response explicitly states the skill produces a point-in-time health snapshot and explicitly distinguishes it from a best-practices audit, both directly and via quoted skill text.",
+          "evidence": "The response states: 'A read-only, point-in-time snapshot answering \"is this cluster healthy right now?\"' and later 'this skill's current-state health grading' contrasted with 'Full best-practices audit... That's a separate skill'",
+          "reasoning": "The output explicitly characterizes the skill as a point-in-time health snapshot and distinguishes it from a best-practices audit, which is described as a separate skill (aws-eks-operations-review).",
           "confidence": "high"
         },
         {
           "text": "The response names aws-eks-operations-review as the skill for the full 9-pillar operations review",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"use `aws-eks-operations-review`.\" and later \"use **`aws-eks-operations-review`** for the comprehensive best-practices audit across all 9 pillars.\"",
-          "reasoning": "The response names aws-eks-operations-review explicitly as the skill for the full 9-pillar review.",
+          "evidence": "\"That's a separate skill: aws-eks-operations-review\" and \"It covers the full 9-pillar operational review\"",
+          "reasoning": "The response explicitly names aws-eks-operations-review as the skill covering the full 9-pillar operational review.",
           "confidence": "high"
         },
         {
           "text": "The response states this skill is read-only",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"a focused, read-only, **point-in-time health snapshot**\"",
-          "reasoning": "The response explicitly describes the health dashboard skill as read-only.",
+          "evidence": "\"A read-only, point-in-time snapshot answering 'is this cluster healthy right now?'\"",
+          "reasoning": "The response explicitly states the skill is read-only.",
           "confidence": "high"
         }
       ],
@@ -57,9 +57,9 @@
   },
   "metrics": {
     "runtime": "6s",
-    "cost": "$0.05",
+    "cost": "$0.06",
     "context_window": {
-      "utilization": "5.1%",
+      "utilization": "4.5%",
       "compaction_count": 0
     }
   }

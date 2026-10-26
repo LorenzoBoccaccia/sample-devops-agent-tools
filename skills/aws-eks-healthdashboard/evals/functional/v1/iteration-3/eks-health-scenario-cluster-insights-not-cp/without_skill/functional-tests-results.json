@@ -10,7 +10,7 @@
     "trigger": null,
     "expected_output": {
       "result": "failed",
-      "reasoning": "The expected output requires the agent to state that EKS Cluster Insights upgrade/config/rollback findings are reported as CA10 to CA12 in the CA-series, and that these are never labelled as CP checks (CP1 to CP11). The agent's response does not mention any CA-series or CP-series naming convention at all. Instead, it discusses 'Rollback readiness insights' category and claims it couldn't find the term 'CP checks' in documentation, ultimately advising caution about using that label. While the agent correctly concludes these are not CP checks, it completely misses the specific CA10-CA12 / CP1-CP11 series terminology that the expected output requires, which is the key factual content being tested.",
+      "reasoning": "The expected output requires the response to identify that EKS Cluster Insights upgrade/config/rollback findings are reported under check series CA10-CA12 (CA-series) and explicitly distinguish them from CP checks (CP1-CP11), confirming they are never labelled as CP checks. The agent's response instead discusses AWS API categories (UPGRADE_READINESS, MISCONFIGURATION, ROLLBACK_READINESS) and concludes there is no 'CP' designation in the documented set. It never mentions the CA-series (CA10-CA12) naming convention or CP1-CP11 series that the expected output specifically calls for. While the agent correctly concludes these are not CP checks, it misses the specific CA-series labeling (CA10 to CA12) that was the core expected fact, and instead substitutes a different (API-based) categorization scheme. This is a mismatch with the expected specific nomenclature.",
       "confidence": "medium"
     },
     "assertions": {
@@ -19,50 +19,50 @@
           "text": "The response states Cluster Insights findings are reported as CA10 through CA12",
           "evaluator": "llm",
           "passed": false,
-          "evidence": "The response never mentions 'CA10' through 'CA12' or any 'CA' prefixed identifiers. It instead refers to categories like 'Rollback readiness insights' (ROLLBACK_READINESS), 'Configuration insights', and 'Upgrade insights'.",
-          "reasoning": "The assertion claims specific CA10-CA12 labeling which is absent from the output.",
+          "evidence": "The response states: 'the official categories exposed by the EKS InsightsFilter API are UPGRADE_READINESS, MISCONFIGURATION, and ROLLBACK_READINESS' with no mention of 'CA10' through 'CA12' anywhere.",
+          "reasoning": "The agent does not mention any CA10-CA12 labeling scheme. It describes categories as UPGRADE_READINESS, MISCONFIGURATION, and ROLLBACK_READINESS from the EKS InsightsFilter API.",
           "confidence": "high"
         },
         {
           "text": "The response states these are never labelled as CP checks",
           "evaluator": "llm",
-          "passed": true,
-          "evidence": "The response states: 'So no \u2014 these aren't officially labelled \"CP checks\" in AWS documentation... I'd be cautious about using it, since it isn't part of the documented terminology.'",
-          "reasoning": "The agent explicitly denies the CP checks label applies, matching the assertion's claim that they are never labelled as CP checks.",
-          "confidence": "high"
+          "passed": false,
+          "evidence": "The response says: 'that's not an AWS-defined term for this feature... I wouldn't label them that way in a grading context' - this is a recommendation/opinion, not a definitive statement that they are 'never' labelled as CP checks.",
+          "reasoning": "The agent does not state these are 'never' labelled as CP checks categorically; it says the term is not AWS-defined and it wouldn't label them that way, but doesn't use the absolute 'never' framing or assert it as a fact about all usage.",
+          "confidence": "medium"
         },
         {
           "text": "The response states the CP checks are CP1 through CP11",
           "evaluator": "llm",
           "passed": false,
-          "evidence": "The response does not mention 'CP1 through CP11' or any numbered CP check list anywhere in the text.",
-          "reasoning": "No such enumeration appears in the output; the agent only discusses the term 'CP checks' generically and dismisses it.",
+          "evidence": "The response states: 'There's no \"CP\" (control plane) designation in the documented category set' - directly contradicting the assertion that CP checks are CP1 through CP11.",
+          "reasoning": "The agent explicitly denies any CP1-CP11 designation existing, stating there's no 'CP' designation in the documented category set. It does not state CP checks are CP1 through CP11.",
           "confidence": "high"
         },
         {
           "text": "The response distinguishes the add-on/version domain (CA-series) from the control-plane domain (CP-series)",
           "evaluator": "llm",
           "passed": false,
-          "evidence": "The response does not use or distinguish 'CA-series' and 'CP-series' terminology at all. It discusses 'Configuration insights', 'Upgrade insights', and 'Rollback readiness insights' instead.",
-          "reasoning": "The assertion requires a specific CA-series vs CP-series distinction that is not present in the output; the agent uses different categorical names entirely.",
+          "evidence": "No mention of 'CA-series' or 'CP-series' naming conventions exists in the response; instead it uses 'UPGRADE_READINESS' and 'MISCONFIGURATION' as the category names.",
+          "reasoning": "The agent does not use or distinguish a CA-series from a CP-series at all. It only discusses UPGRADE_READINESS, MISCONFIGURATION, and ROLLBACK_READINESS categories, and denies the existence of a CP series.",
           "confidence": "high"
         }
       ],
       "summary": {
-        "passed": 1,
-        "failed": 3,
+        "passed": 0,
+        "failed": 4,
         "errored": 0,
         "low_confidence": 0,
         "total": 4,
-        "pass_rate": 0.25
+        "pass_rate": 0.0
       }
     }
   },
   "metrics": {
-    "runtime": "11s",
-    "cost": "$0.10",
+    "runtime": "4s",
+    "cost": "$0.04",
     "context_window": {
-      "utilization": "4.4%",
+      "utilization": "4.2%",
       "compaction_count": 0
     }
   }

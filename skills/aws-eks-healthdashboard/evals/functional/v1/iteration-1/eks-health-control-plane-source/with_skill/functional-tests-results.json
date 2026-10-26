@@ -14,8 +14,8 @@
     },
     "expected_output": {
       "result": "passed",
-      "reasoning": "The agent's response correctly states that the control plane is AWS-managed, so checks are graded from CloudWatch Logs Insights (audit log) and CloudWatch metrics rather than kubectl. It also correctly states the CP-M fallback order: CloudWatch first, then Prometheus/AMP when detected, then raw API-server /metrics, then N/A. This matches the expected output exactly in substance.",
-      "evidence": "\"The control plane (etcd, APF, API-server, controller-manager, scheduler) is AWS-managed \u2014 there's no cluster-side access to it. So CP1\u2013CP11 and CP-M1\u2013CP-M9 are graded from CloudWatch Logs Insights (the audit log) plus CloudWatch metrics, never kubectl.\" and \"1. CloudWatch... 2. Prometheus/AMP \u2014 mandatory if detected... 3. Raw API-server /metrics... 4. N/A \u2014 only after all three sources above were attempted\"",
+      "reasoning": "The agent's response correctly states that the control plane is AWS-managed (no node/API-server access), so CP checks are graded from CloudWatch Logs Insights (audit log) and CloudWatch metrics rather than kubectl. It also correctly states the CP-M fallback order: CloudWatch first, then Prometheus/AMP (mandatory if detected), then raw API server /metrics, then N/A. This matches the expected output precisely in substance.",
+      "evidence": "\"So the skill grades CP1\u2013CP11 ... from CloudWatch Logs Insights (the audit log) and CloudWatch metrics \u2014 never from kubectl.\" and \"1. CloudWatch ... 2. Prometheus / AMP \u2014 if an AMP workspace or in-cluster Prometheus was detected ... is mandatory ... 3. Raw API server /metrics via use_kubectl get --raw /metrics ... 4. N/A\"",
       "confidence": "high"
     },
     "assertions": {
@@ -24,32 +24,32 @@
           "text": "The response states the control plane is AWS-managed, so control-plane signals come from CloudWatch Logs Insights and CloudWatch metrics rather than kubectl",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"The control plane (etcd, APF, API-server, controller-manager, scheduler) is AWS-managed \u2014 there's no cluster-side access to it. So CP1\u2013CP11 and CP-M1\u2013CP-M9 are graded from CloudWatch Logs Insights (the audit log) plus CloudWatch metrics, never kubectl.\"",
-          "reasoning": "The response explicitly states the control plane is AWS-managed and that signals come from CloudWatch Logs Insights and CloudWatch metrics rather than kubectl.",
+          "evidence": "\"The control plane is AWS-managed \u2014 there's no node you can SSH into or API-server pod you control directly. So the skill grades CP1\u2013CP11 ... from CloudWatch Logs Insights (the audit log) and CloudWatch metrics \u2014 never from kubectl.\"",
+          "reasoning": "The response explicitly ties the AWS-managed nature of the control plane to the use of CloudWatch Logs Insights and CloudWatch metrics instead of kubectl.",
           "confidence": "high"
         },
         {
           "text": "The response gives the CP-M source-fallback order as CloudWatch, then Prometheus or AMP when detected, then raw API server /metrics, then N/A",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"1. CloudWatch (native AWS/EKS metrics / Container Insights) 2. Prometheus/AMP \u2014 mandatory if detected... 3. Raw API-server /metrics via use_kubectl get --raw /metrics 4. N/A \u2014 only after all three sources above were attempted and none carried the signal.\"",
-          "reasoning": "The response gives the exact fallback order asserted: CloudWatch, then Prometheus/AMP if detected, then raw /metrics, then N/A.",
+          "evidence": "\"1. CloudWatch (native AWS/EKS metrics / Container Insights) 2. Prometheus / AMP \u2014 if an AMP workspace or in-cluster Prometheus was detected ... 3. Raw API server /metrics via use_kubectl get --raw /metrics 4. N/A \u2014 only after all three sources above were attempted and came up empty\"",
+          "reasoning": "The response gives exactly the fallback order asserted: CloudWatch, then Prometheus/AMP when detected, then raw /metrics, then N/A.",
           "confidence": "high"
         },
         {
           "text": "The response states a metric absent from CloudWatch is not N/A until Prometheus and the raw /metrics endpoint have been attempted",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"4. N/A \u2014 only after all three sources above were attempted and none carried the signal.\" and \"these must be pulled from Prometheus or /metrics before being marked N/A.\"",
-          "reasoning": "The response explicitly states that a metric is not marked N/A until Prometheus and raw /metrics have been attempted.",
+          "evidence": "\"CP-M3/M5/M6/M7/M8/M9 aren't in CloudWatch's curated metric subset, so those specifically must be pulled from Prometheus or raw /metrics before being marked N/A \u2014 'absent from CloudWatch' alone never justifies N/A.\"",
+          "reasoning": "The response explicitly states that a metric absent from CloudWatch is not N/A until Prometheus and raw /metrics have been attempted, matching the assertion.",
           "confidence": "high"
         },
         {
           "text": "The response states that when Prometheus or AMP is present it must be queried for the metric-native checks rather than relying on CloudWatch alone",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"Prometheus/AMP \u2014 mandatory if detected, since Prometheus carries the full apiserver metric set... skipping Prometheus just because CloudWatch returned partial values isn't allowed\"",
-          "reasoning": "The response explicitly states Prometheus/AMP is mandatory when detected and that relying on CloudWatch alone (skipping Prometheus) is not allowed.",
+          "evidence": "\"Prometheus / AMP \u2014 if an AMP workspace or in-cluster Prometheus was detected in Step 1, querying it is mandatory, not optional (it carries the full apiserver metric set, including histograms CloudWatch omits)\"",
+          "reasoning": "The response clearly states that when Prometheus/AMP is detected, querying it is mandatory rather than relying on CloudWatch alone, satisfying the assertion.",
           "confidence": "high"
         }
       ],
@@ -64,10 +64,10 @@
     }
   },
   "metrics": {
-    "runtime": "6s",
-    "cost": "$0.05",
+    "runtime": "8s",
+    "cost": "$0.07",
     "context_window": {
-      "utilization": "5.1%",
+      "utilization": "4.5%",
       "compaction_count": 0
     }
   }

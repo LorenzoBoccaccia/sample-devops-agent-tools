@@ -31,6 +31,19 @@ This is the single most common false PASS in a health dashboard. A CloudWatch Lo
 
 Only after all four check out is an empty result graded ✅. Otherwise it is ⚪ N/A with the real reason, or a FAIL finding that logging/telemetry is missing. The same rule applies to `GetMetricData` returning no datapoints for the CP-M metric-native checks.
 
+## Denied or unavailable tool / permission (companion to FP11)
+
+FP11 covers a query that **ran** and came back empty. This is the different case: the call **could not run at all** — the tool is not assigned to the agent, or the request was rejected (`AccessDenied` / `UnauthorizedOperation` on `use_aws`, RBAC `Forbidden` / `could not get token` on `use_kubectl`, a missing `query_cloudwatch_logs` permission, etc.). A failed call is **not evidence**, so never grade around it and never fabricate, infer, or silently skip a result.
+
+When a required tool call is denied or the tool is unavailable:
+
+1. **Grade every affected check ⚪ N/A** with the access error as the stated reason — e.g. "N/A — `use_aws` CloudWatch GetMetricData denied: user is not authorized to perform `cloudwatch:GetMetricData`." A denied call is never ✅ and never ❌ on the signal itself.
+2. **Name the exact missing permission or tool** so the user can fix it: the read-only IAM action(s) needed (e.g. `eks:DescribeCluster`, `cloudwatch:GetMetricData`, `logs:StartQuery`/`logs:GetQueryResults`), or the tool that must be assigned (`use_kubectl`, `use_aws`, `query_cloudwatch_logs`), plus any RBAC the kubectl identity lacks.
+3. **Surface it to the user as an access/observability-gap finding** — a visible finding in the dashboard, not a buried N/A. If the denial is broad enough that a whole domain cannot be assessed (e.g. no `use_aws` at all), say so plainly and report what *was* reachable rather than implying full coverage.
+4. **Distinguish it from FP11 in the reason text.** "Access denied / tool unavailable" (the call failed) is a different N/A reason from "query ran, zero rows" (FP11) — never collapse the two, because they point the user at different fixes (grant access vs. enable logging).
+
+A denied call that blocks the cluster-confirmation step (Step 0) or every grading source means the dashboard cannot be produced — report the access problem and what the agent needs, rather than emitting an empty or guessed dashboard.
+
 ## Confidence contract
 
 Attach a confidence level to every non-trivial verdict:

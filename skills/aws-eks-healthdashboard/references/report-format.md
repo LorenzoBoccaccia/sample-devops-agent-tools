@@ -21,6 +21,8 @@ Grade with internal tiers, render descriptive labels (no Sev numbers in customer
 
 ## Sections (in order)
 
+> **Scorecard row IDs (§4–§6):** every scorecard row uses the exact check ID and name from its reference file: CA from [`cluster-addon-health.md`](cluster-addon-health.md), CP and CP-M from [`control-plane-health.md`](control-plane-health.md), and NH, NH-P and NET from [`node-health.md`](node-health.md). Never invent, renumber, merge, or number source groups. Query IDs from [`queries.md`](queries.md) (CP1–CP25) are evidence for a row, not rows themselves.
+
 ### 1. Header
 Cluster name · ARN · account · region · Kubernetes version + support status · timestamp (UTC).
 

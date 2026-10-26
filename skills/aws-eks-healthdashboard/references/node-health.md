@@ -29,7 +29,7 @@ skip silently.
 | NH2 | No DiskPressure | `DiskPressure!=True` | 0 nodes | High |
 | NH3 | No MemoryPressure | `MemoryPressure!=True` | 0 nodes | High |
 | NH4 | No PIDPressure | `PIDPressure!=True` | 0 nodes | Medium |
-| NH5 | Kubelet version skew | kubelet minor within 1 of control-plane, uniform across nodes | within skew | Medium |
+| NH5 | Kubelet version skew | kubelet no more than 3 minors older than the EKS control plane version (a kubelet < 1.25 may be at most 2 minors older than the control plane), and never newer. At the 3-minor edge the node is still in skew but blocks the next control-plane upgrade (⚠️, not a FAIL); beyond the limit (>3 older, or newer than CP) the node is out of supported skew and the kubelet may fail to communicate with the control plane — that is a FAIL. With no registered nodes there is nothing to compare: report ⚪ N/A "No registered nodes", never ✅, and do not use the Cluster Insights kubelet-skew result (CA10) in its place. | within skew | Medium |
 | NH6 | Allocatable headroom | pods/CPU/mem allocatable vs capacity; no node pinned at max pods | headroom present | Medium |
 
 ## Node utilization (Container Insights — namespace `ContainerInsights`)

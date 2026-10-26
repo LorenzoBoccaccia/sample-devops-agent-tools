@@ -1,20 +1,6 @@
 ---
 name: aws-eks-healthdashboard
-description: >-
-  Use this skill when the user wants to know whether an Amazon EKS cluster is
-  healthy right now, or asks you to assess, triage, or report on the state of an
-  EKS cluster, its control plane, or its nodes — even when they don't say
-  "dashboard" or name a specific subsystem. It produces a read-only, point-in-time
-  health snapshot that grades control-plane signals (etcd, API Priority & Fairness,
-  API-server latency and errors, scheduler) and node/data-plane signals (node
-  conditions, utilization, EC2/ENA/EBS, NAT, CoreDNS, Karpenter, nodegroup
-  registration), reading from whatever observability is connected
-  (CloudWatch, native EKS metrics, Prometheus, Datadog, New Relic, Dynatrace, or
-  Splunk). Reach for it for "is my cluster okay" questions, control-plane or
-  node-health checks, and latency/throttling spikes; it only reads state and does
-  not remediate. This is a current-state snapshot, not a best-practices audit — for
-  a full Well-Architected / EKS Best Practices operational review use
-  aws-eks-operations-review instead.
+description: "Use this skill when the user wants to know whether an Amazon EKS cluster is healthy right now, or asks you to assess, triage, or report on the state of an EKS cluster, its control plane, or its nodes — even when they don't say \"dashboard\" or name a specific subsystem. It produces a read-only, point-in-time health snapshot grading control-plane signals (etcd, API Priority & Fairness, API-server latency and errors, scheduler) and node/data-plane signals (node conditions, utilization, EC2/ENA/EBS, NAT, CoreDNS, Karpenter, nodegroup registration), from whatever observability is connected (CloudWatch, native EKS metrics, Prometheus, Datadog, New Relic, Dynatrace, or Splunk). Reach for it for \"is my cluster okay\" questions, control-plane or node-health checks, and latency/throttling spikes; it only reads state and does not remediate. This is a current-state snapshot, not a best-practices audit — for a full EKS Best Practices operational review use aws-eks-operations-review instead."
 metadata:
   author: kuntshah
   version: 1.0.0
@@ -86,6 +72,7 @@ Grade **CP1–CP11 + CP-M1–CP-M9** from [`references/control-plane-health.md`]
 - **For the CP-M checks, follow the source-fallback order** in [`references/control-plane-health.md`](references/control-plane-health.md) (CloudWatch → **Prometheus/AMP if detected (mandatory)** → raw API server `/metrics` via `use_kubectl get --raw /metrics` → N/A). CP-M3/M5/M6/M7/M8/M9 are absent from CloudWatch's curated subset, so pull them from Prometheus or the raw `/metrics` endpoint before marking ⚪ N/A; a metric absent from CloudWatch is **not** an N/A until Prometheus and `/metrics` were attempted. A Prometheus query that returns empty for a metric that should exist is a **scrape-coverage gap** (histograms dropped / apiserver job not scraped), not a PASS.
 - Follow the investigation procedures in [`references/procedures.md`](references/procedures.md) (`health_overview` first, then drill into non-`ok` signals); evaluate against [`references/thresholds.md`](references/thresholds.md).
 - Apply the grading guards in [`references/grading-guards.md`](references/grading-guards.md) before fixing any verdict — an empty query / no-datapoint result is *unknown*, never an automatic PASS (FP11); a 429 spike is not "scale the control plane" (FP6). Record the applied guard ID and a confidence level with each status.
+- **If a required tool call is denied or the tool is unavailable** (`use_kubectl`/`use_aws`/`query_cloudwatch_logs` not assigned, `AccessDenied`, RBAC `Forbidden`), never fabricate or grade around it: mark the affected checks ⚪ N/A with the access error as the reason, name the exact missing permission or tool the user must grant, and surface it as an access/observability-gap finding (see *Denied or unavailable tool / permission* in [`references/grading-guards.md`](references/grading-guards.md)). This is distinct from FP11's empty-result case — the call failed rather than returning nothing.
 - Run CP19–CP25 only when a matching auth / write-path / change-correlation / WATCH / mutation-attribution / anonymous-access signal appears — they are triggered diagnostics, not scorecard rows.
 - Mark a check ⚪ N/A only after attempting and finding no source carries the signal — never "pending."
 - **CP checks are CP1–CP11.** Cluster-Insights / upgrade items (kube-proxy skew, AL2, kubelet skew, addon compat) are **not** CP checks.
@@ -101,6 +88,7 @@ Grade the **NH-series** from [`references/node-health.md`](references/node-healt
 - [ ] Every threshold used came from [`references/thresholds.md`](references/thresholds.md) — no fabricated or remembered numbers.
 - [ ] Every ⚪ N/A carries a concrete reason (source attempted and absent), never "pending" or a silent skip.
 - [ ] No empty-result was scored as PASS (FP11), and every verdict has its applied guard ID and confidence recorded ([`references/grading-guards.md`](references/grading-guards.md)).
+- [ ] Any denied or unavailable tool/permission was graded ⚪ N/A with the access error and the missing permission/tool named, and surfaced as a finding — never fabricated or graded around.
 - [ ] Findings analysis reasons from observed evidence and does not recite canned definitions.
 
 Then write the artifact per [`references/report-format.md`](references/report-format.md): header, overall health, sources & coverage, Control Plane scorecard (CP + CP-M), Node & Data-Plane scorecard (NH + NH-P + NET), detailed findings for every ❌/⚠️ with remediation + AWS link, recommended CloudWatch alarms, and "what was not assessed." Refresh a same-day artifact instead of duplicating. Default `eks-health-{cluster}-{date}.md`.
@@ -125,7 +113,7 @@ Emit the dashboard as **one Markdown `text` artifact element** — Markdown `##`
 | [`references/queries.md`](references/queries.md) | Running the CloudWatch Logs Insights queries — CP1–CP18 (core) + CP19–CP25 (auth denials, write-path latency, change-correlation, watch volume, mutation attribution, anonymous access). |
 | [`references/metric-sources.md`](references/metric-sources.md) | Detecting sources and getting per-source queries (CW Insights / Container Insights / PromQL / connectors / `metrics.eks.amazonaws.com` / kube-state-metrics / node-exporter / VPC CNI metrics helper). |
 | [`references/thresholds.md`](references/thresholds.md) | Control-plane thresholds + the CP-M series + override format + cross-validation rules. |
-| [`references/grading-guards.md`](references/grading-guards.md) | **Before fixing any CA/CP/CP-M/CPM/NH verdict** — the false-positive controls (FP1–FP12), the empty-result rule, and the confidence contract. |
+| [`references/grading-guards.md`](references/grading-guards.md) | **Before fixing any CA/CP/CP-M/CPM/NH verdict** — the false-positive controls (FP1–FP12), the empty-result rule, the denied/unavailable tool-or-permission rule, and the confidence contract. |
 | [`references/procedures.md`](references/procedures.md) | The investigation procedures (`health_overview`, `etcd_pressure`, `apf_health`, …). |
 | [`references/node-health.md`](references/node-health.md) | Grading the NH-series + the NH-P depth checks (KSM/node-exporter/kubelet) + the NET series (VPC CNI IP health). |
 | [`references/remediations-etcd.md`](references/remediations-etcd.md), [`references/remediations-apf.md`](references/remediations-apf.md), [`references/remediations-apiserver.md`](references/remediations-apiserver.md) | Control-plane remediation playbooks for a FAIL (R-ETCD-* / R-APF-* / R-API-*/R-KCM-*/R-SCHED-*/R-EVICT-*/R-CP-*). |

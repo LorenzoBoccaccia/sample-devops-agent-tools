@@ -14,9 +14,8 @@
     },
     "expected_output": {
       "result": "passed",
-      "reasoning": "The agent's response covers all key elements of the expected output: (1) checks graded N/A with reason tied to control-plane logging disabled - explicitly stated 'each check that depends solely on the audit log becomes N/A \u2014 the real reason being control-plane logging disabled, audit stream unavailable'; (2) never a PASS - explicitly stated and justified via the empty-result rule verification checklist (logging enabled, log group/stream exists, delivery delay, correct window/filter) matching the expected 'unknown until logging/stream/delay/window/filter are verified'; (3) a finding is raised - stated as CA3 finding for disabled logging, described as a visibility gap (matches 'visibility FAIL recommending enablement' in spirit, though it doesn't explicitly use the word 'FAIL' or explicitly state 'recommending enablement' - this is a minor gap); (4) public CloudWatch control-plane metrics are still attempted - explicitly confirmed with detail on CloudWatch/Container Insights and fallback order. The response is substantively aligned with the expected output, with only minor wording differences (e.g., not explicitly saying 'FAIL' severity or 'recommending enablement' for the CA3 finding, though it does call it a finding and visibility gap).",
-      "evidence": "\"each check that depends solely on the audit log becomes \u26aa N/A \u2014 the real reason being 'control-plane logging disabled, audit stream unavailable'... the disabled logging itself is raised as its own finding under CA3 (control-plane logging), since missing telemetry is a visibility gap... Are public control-plane metrics still attempted? Yes.\"",
-      "confidence": "medium"
+      "reasoning": "The agent's response covers all required elements: (1) audit-log-only CP checks (e.g., CP3) are graded N/A with the explicit reason 'logging disabled', matching 'control-plane logging disabled'; (2) explicitly states this is never a PASS, citing the FP11 empty-result rule; (3) raises a FAIL finding (CA3/CPM1) for disabled logging with a recommendation to enable api+audit logging - a visibility finding; (4) confirms public CloudWatch control-plane metrics are still attempted/pulled (native AWS/EKS metrics, Container Insights, Prometheus/AMP) for CP1, CP2, CP4-CP11 etc. All four expected elements are substantively present and correctly reasoned.",
+      "confidence": "high"
     },
     "assertions": {
       "assertion_results": [
@@ -24,66 +23,58 @@
           "text": "The response grades the audit-log-derived CP checks N/A rather than PASS",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"each check that depends solely on the audit log becomes \u26aa N/A\" and \"Never a PASS.\"",
-          "reasoning": "The response explicitly grades audit-log-derived CP checks as N/A, not PASS.",
+          "evidence": "\"Any CP check that is audit-log-only \u2014 most notably CP3 (etcd write concentration), plus per-caller latency and throttling detail \u2014 gets marked \u26aa N/A, with the reason stated explicitly as 'logging disabled'\" and \"No. This is exactly the case FP11 (the empty-result rule) exists to block... never a PASS.\"",
+          "reasoning": "The response explicitly grades audit-log-only CP checks as N/A and explicitly states this is never a PASS.",
           "confidence": "high"
         },
         {
           "text": "The stated reason for N/A is that control-plane logging is disabled",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"the real reason being 'control-plane logging disabled, audit stream unavailable,' not 'pending' or a silent skip\"",
-          "reasoning": "The response states the reason for N/A is disabled control-plane logging.",
+          "evidence": "\"gets marked \u26aa N/A, with the reason stated explicitly as 'logging disabled' rather than left as a silent skip or 'pending.'\"",
+          "reasoning": "The response directly states the N/A reason is logging disabled.",
           "confidence": "high"
         },
         {
           "text": "The response states missing telemetry is a visibility gap and never evidence of health",
           "evaluator": "llm",
-          "passed": false,
-          "evidence": "The response says: \"Zero rows from the audit-log queries is not evidence of a healthy control plane\" (first part) and separately \"since missing telemetry is a visibility gap\" (second part) - these are stated but not tied together as one combined assertion stating both the visibility gap framing AND never evidence of health together.",
-          "reasoning": "The response does not explicitly state that missing telemetry is a visibility gap AND never evidence of health in those exact combined terms; it says 'missing telemetry is a visibility gap' in the context of raising a finding, but does not explicitly restate that missing telemetry is never evidence of health (it does say empty result is not evidence of a healthy control plane, which is similar but phrased differently and in a different context).",
+          "passed": true,
+          "evidence": "\"An empty Logs Insights query \u2014 whether from disabled logging, a missing log stream, delivery delay, or a bad query window \u2014 is never automatically graded as healthy/PASS. It's treated as unknown until all four of these are checked... this is surfaced as a visible observability gap, not buried.\"",
+          "reasoning": "The response conveys that missing telemetry (empty results) is treated as unknown/a gap and never evidence of health (never PASS), and explicitly calls it a visible observability gap. This substantively matches the assertion even though the exact phrase 'visibility gap...never evidence of health' isn't used verbatim.",
           "confidence": "medium"
         },
         {
           "text": "The response records a visibility FAIL finding for the disabled control-plane logging",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"the disabled logging itself is raised as its own finding under CA3 (control-plane logging), since missing telemetry is a visibility gap. So you end up with: CA3 flagged as a finding (logging disabled)\"",
-          "reasoning": "The response records a finding for disabled control-plane logging under CA3, which represents a visibility gap/failure.",
+          "evidence": "\"CA3 / CPM1 (control-plane logging enabled) is graded as a FAIL, with a recommendation to enable api + audit logging.\" and \"A FAIL on CA3/CPM1 for logging being disabled (with the enable-logging remediation).\"",
+          "reasoning": "The response explicitly records a FAIL finding tied to disabled control-plane logging, which serves as the visibility/observability FAIL finding.",
           "confidence": "high"
         },
         {
           "text": "The response states the public CloudWatch control-plane metrics are still attempted",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"Are public control-plane metrics still attempted? Yes... still grade from metrics \u2014 native AWS/EKS CloudWatch metrics / Container Insights \u2014 and any Prometheus/connector source that's present.\"",
-          "reasoning": "The response explicitly states that public CloudWatch control-plane metrics are still attempted.",
-          "confidence": "high"
-        },
-        {
-          "text": "The response states an empty result is unknown until logging enablement, log group/stream, delivery delay, query window, and filter are verified",
-          "evaluator": "llm",
-          "passed": true,
-          "evidence": "\"an empty query must be verified against four things (logging enabled, log group/stream exists, delivery delay, correct window/filter) before it can ever be graded\"",
-          "reasoning": "The response lists all four verification items (logging enabled, log group/stream exists, delivery delay, correct window/filter) that must be checked before grading an empty result.",
+          "evidence": "\"Are public control-plane metrics still attempted? Yes, mandatorily... native AWS/EKS control-plane metrics (EKS 1.28+)... CP1, CP2, CP4\u2013CP11 and the full CP-M1\u2013CP-M9 series are graded from metrics (CloudWatch \u2192 Prometheus/AMP if detected \u2192 raw /metrics via use_kubectl), following the normal source-fallback order.\"",
+          "reasoning": "The response explicitly confirms that public CloudWatch control-plane metrics are still attempted/collected despite disabled logging.",
           "confidence": "high"
         }
       ],
       "summary": {
         "passed": 5,
-        "failed": 1,
+        "failed": 0,
         "errored": 0,
         "low_confidence": 0,
-        "total": 6,
-        "pass_rate": 0.8333
+        "total": 5,
+        "pass_rate": 1.0
       }
     }
   },
   "metrics": {
-    "runtime": "14s",
-    "cost": "$0.12",
+    "runtime": "15s",
+    "cost": "$0.13",
     "context_window": {
-      "utilization": "4.8%",
+      "utilization": "6.0%",
       "compaction_count": 0
     }
   }

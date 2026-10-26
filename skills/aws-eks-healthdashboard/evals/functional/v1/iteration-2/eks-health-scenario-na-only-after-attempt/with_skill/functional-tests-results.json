@@ -14,7 +14,7 @@
     },
     "expected_output": {
       "result": "passed",
-      "reasoning": "The agent's response states that N/A may only be marked after a source was actually attempted and found to carry no signal (going through the fallback order), that every N/A must carry a real, specific reason, and explicitly bans 'pending' as an N/A reason. This matches all three elements of the expected output: (1) N/A only after attempting sources and finding no signal, (2) real reason required for each N/A, (3) 'pending' is never valid.",
+      "reasoning": "The agent's response matches the expected output criteria: it states N/A is only valid after a source was actually attempted and found to not carry the signal (including the full source-fallback order for CP-M checks), requires each N/A to have a documented real reason (named missing permission/tool or confirmed absent source), and explicitly states 'pending' is disallowed as an N/A reason. All three key elements of the expected output are substantively covered.",
       "confidence": "high"
     },
     "assertions": {
@@ -23,33 +23,33 @@
           "text": "The response states N/A is used only after every source has been attempted and none carries the signal",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response states: 'Only after a source was actually attempted and found to carry no signal for that check' and 'N/A requires exhausting the fallback sources first'",
-          "reasoning": "The output explicitly states N/A is only used after sources have been attempted and found to lack signal, and emphasizes exhausting fallback sources before marking N/A.",
+          "evidence": "The response states N/A applies 'Only after a source was actually attempted and found to not carry the signal' and for CP-M checks 'N/A only applies after following the full source-fallback order (CloudWatch \u2192 Prometheus/AMP \u2192 raw API server /metrics)'",
+          "reasoning": "This matches the assertion that N/A is used only after every applicable source has been attempted and none carries the signal.",
           "confidence": "high"
         },
         {
           "text": "The response states each N/A carries a concrete reason",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response states: 'every N/A must carry a real, specific reason (source attempted and absent)' and 'must always state which source was attempted and found absent'",
-          "reasoning": "The output explicitly asserts that each N/A must carry a concrete, specific reason, matching the assertion.",
+          "evidence": "The response states 'N/A requires a concrete, documented reason (source absent after being tried, or a named denied permission/tool)' and that affected checks are marked N/A 'with the access error as the reason, naming the exact missing permission/tool.'",
+          "reasoning": "The output explicitly states each N/A must have a concrete, documented reason.",
           "confidence": "high"
         },
         {
           "text": "The response states a check is never left as pending",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response states: 'Marking something N/A as \"pending\" \u2014 that's explicitly banned (\"never 'pending'\")' and 'never a vague or deferred reason like \"pending.\"'",
-          "reasoning": "The output explicitly states that marking a check as pending is forbidden/banned, directly supporting this assertion.",
+          "evidence": "The response states '\"Pending\" is explicitly disallowed \u2014 the skill states N/A should never be marked as \"pending\" or used as a silent skip.'",
+          "reasoning": "This directly supports the assertion that a check is never left as pending.",
           "confidence": "high"
         },
         {
           "text": "The response states the agent never guesses or silently skips a status",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response states: 'A silent skip with no concrete reason \u2014 every N/A must carry a real, specific reason' addressing silent skips, but does not explicitly use the word 'guesses' in relation to never guessing a status.",
-          "reasoning": "The output explicitly forbids silent skips without concrete reasons, satisfying that part of the assertion. However, it does not explicitly state the agent 'never guesses' a status - it discusses silent skips but not guessing specifically. The substance of 'never silently skips' is clearly present, but the 'never guesses' component is not directly addressed. Since the assertion is a compound claim and at least the silent-skip portion is substantively covered, and no guessing behavior is implied elsewhere, I lean towards passing but with medium confidence since 'guesses' isn't explicitly covered.",
-          "confidence": "medium"
+          "evidence": "The response states 'Every N/A must also be surfaced as its own observability-gap or access-gap finding \u2014 never a silent skip' and 'An empty query result / no-datapoint result must not be scored as a definitive status either \u2014 that's treated as unknown... not casually waved off as N/A without investigation.'",
+          "reasoning": "The response conveys that the agent never silently skips a status and treats ambiguous results as unknown rather than guessing, satisfying the assertion's substance.",
+          "confidence": "high"
         }
       ],
       "summary": {
@@ -66,7 +66,7 @@
     "runtime": "7s",
     "cost": "$0.06",
     "context_window": {
-      "utilization": "5.1%",
+      "utilization": "4.5%",
       "compaction_count": 0
     }
   }

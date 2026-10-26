@@ -13,9 +13,9 @@
       "skill_loads_found": 1
     },
     "expected_output": {
-      "result": "failed",
-      "reasoning": "The agent correctly covered three of the four required points: conflicting evidence forces Low confidence and surfaces disagreement as its own finding, correlation is not root cause, and missing data cannot prove health/absence. However, it completely omitted the fourth required element: that evidence older than seven days cannot override newer evidence. This is a specific, checkable fact that was expected but missing from the response.",
-      "evidence": "Agent's response lists only three bullet points (conflicting evidence/Low confidence, correlation not root cause, missing data not proof of health) with no mention of a seven-day evidence recency rule.",
+      "result": "passed",
+      "reasoning": "The agent's response explicitly states all required elements: (1) conflicting evidence forces Low confidence and must be surfaced as its own finding, (2) correlation is not root cause, (3) missing data cannot prove health or absence, and (4) evidence older than seven days cannot override newer evidence. All criteria from the expected output are substantively matched.",
+      "evidence": "\"Conflicting evidence forces Low confidence \u2014 and per the metric-sources cross-validation rules, that disagreement must also be surfaced as its own finding... Correlation is not root cause... Missing data cannot prove health or absence... evidence older than seven days can't override newer evidence when conflicts arise.\"",
       "confidence": "high"
     },
     "assertions": {
@@ -25,49 +25,49 @@
           "evaluator": "llm",
           "passed": true,
           "evidence": "\"Conflicting evidence forces Low confidence\"",
-          "reasoning": "The response explicitly states this.",
+          "reasoning": "Directly states this.",
           "confidence": "high"
         },
         {
           "text": "The response states the disagreement between sources is surfaced as its own finding",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"and it must also surface the disagreement as its own finding (per metric-sources.md \u00a75)\"",
-          "reasoning": "The response explicitly states the disagreement must be surfaced as its own finding.",
+          "evidence": "\"that disagreement must also be surfaced as its own finding, not just reflected in the confidence score\"",
+          "reasoning": "Directly states this.",
           "confidence": "high"
         },
         {
           "text": "The response states correlation is not root cause",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"Correlation may not be treated as root cause.\"",
-          "reasoning": "The response explicitly states this.",
+          "evidence": "\"Correlation is not root cause.\"",
+          "reasoning": "Directly states this.",
           "confidence": "high"
         },
         {
           "text": "The response states missing data cannot prove health or absence",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"Missing data may not be treated as proof of health or absence \u2014 an empty query/no-datapoint result is \\\"unknown,\\\" never an automatic pass\"",
-          "reasoning": "The response explicitly states this, covering both 'health' and effectively 'absence' as well.",
+          "evidence": "\"Missing data cannot prove health or absence.\"",
+          "reasoning": "Directly states this.",
           "confidence": "high"
         },
         {
           "text": "The response states evidence older than seven days cannot override newer evidence",
           "evaluator": "llm",
-          "passed": false,
-          "evidence": "No mention of 'seven days', 'older evidence', or any time-based override rule anywhere in the response.",
-          "reasoning": "The response does not address this topic at all; it was not asked about in the original prompt and is absent from the output.",
+          "passed": true,
+          "evidence": "\"evidence older than seven days can't override newer evidence when conflicts arise.\"",
+          "reasoning": "Directly states this.",
           "confidence": "high"
         }
       ],
       "summary": {
-        "passed": 4,
-        "failed": 1,
+        "passed": 5,
+        "failed": 0,
         "errored": 0,
         "low_confidence": 0,
         "total": 5,
-        "pass_rate": 0.8
+        "pass_rate": 1.0
       }
     }
   },

@@ -9,8 +9,9 @@
   "tests": {
     "trigger": null,
     "expected_output": {
-      "result": "passed",
-      "reasoning": "The agent correctly states this is not a clean PASS, and characterizes the empty result as EMPTY (not OK/success), explaining it must be investigated as a potential scrape/remote-write gap or dimension mismatch - consistent with the expected framing of a 'gap' rather than health. It explicitly names scrape coverage concerns (apiserver not emitting the histogram, scrape/remote-write gap into AMP) which aligns with the expected 'scrape-coverage gap' characterization. The core conclusions - not a PASS, and the empty result is a gap requiring explanation rather than being equated with health - are present.",
+      "result": "failed",
+      "reasoning": "The expected output requires the agent to state definitively that this is NOT a PASS, and characterize the empty Prometheus result as a scrape-coverage gap (histograms dropped or apiserver job not scraped), recorded as a gap rather than health. Instead, the agent's response claims it cannot find the relevant skill in its agent space and declines to answer the question, offering only to investigate further or do ad-hoc analysis. It never states the PASS/FAIL determination nor characterizes the empty result as a scrape-coverage gap. This does not substantively meet the expected criteria.",
+      "evidence": "\"I checked the agent space for a skill covering EKS health dashboard grading criteria, but I couldn't find one... If this grading logic lives in a different agent space... I won't be able to pull it up.\"",
       "confidence": "high"
     },
     "assertions": {
@@ -18,51 +19,51 @@
         {
           "text": "The response states the empty Prometheus result is not a PASS",
           "evaluator": "llm",
-          "passed": true,
-          "evidence": "\"this is **not a clean PASS**\" and \"EMPTY is explicitly *not* treated as success\"",
-          "reasoning": "The response directly states that this result is not a PASS.",
+          "passed": false,
+          "evidence": "The agent never states a PASS/FAIL verdict at all. It says: 'I checked the agent space for a skill covering EKS health dashboard grading criteria, but I couldn't find one... I won't be able to pull it up.' There is no statement that the empty result is not a PASS.",
+          "reasoning": "The agent explicitly declines to answer the grading question because it cannot find the relevant skill, so it never asserts whether the empty result is a PASS or not.",
           "confidence": "high"
         },
         {
           "text": "The response characterises it as a scrape-coverage gap, such as histograms dropped or the apiserver job not scraped",
           "evaluator": "llm",
-          "passed": true,
-          "evidence": "\"is the apiserver actually not emitting that histogram in this window, is there a scrape/remote-write gap into AMP, or is this a dimension/label mismatch in the query itself\"",
-          "reasoning": "The response does mention a scrape/remote-write gap as one possible explanation for the empty result, which aligns with characterizing it as a scrape-coverage gap. However, it presents this as one of three possibilities rather than definitively characterizing it as a scrape-coverage gap specifically; it hedges with multiple hypotheses (metric not emitted, scrape/remote-write gap, or dimension/label mismatch) rather than committing to the scrape-coverage framing. The assertion is partially satisfied since the scrape gap language is present, but it's not the primary characterization.",
-          "confidence": "medium"
+          "passed": false,
+          "evidence": "The agent only offers a hypothetical list of possibilities if it were to investigate itself: 'metric not scraped, wrong job label, workspace not receiving apiserver metrics' - but this is offered as a caveat to an optional follow-up analysis, not as a characterization of the gap per any skill or definitive finding.",
+          "reasoning": "While the phrase 'metric not scraped' appears, it's presented as one of several speculative possibilities under an optional offer to investigate, not as the agent's characterization of the actual finding per a skill or rubric. The assertion asks whether the response characterizes it as a scrape-coverage gap, which requires a definitive characterization, not a hedge.",
+          "confidence": "high"
         },
         {
           "text": "The response states Prometheus/AMP must be queried for the metric-native checks when detected",
           "evaluator": "llm",
           "passed": false,
-          "evidence": "The response does not state a general rule that Prometheus/AMP must be queried for metric-native checks when detected; it only discusses this specific instance and offers to check scrape config/remote-write setup.",
-          "reasoning": "There is no statement in the response establishing a general principle that Prometheus/AMP must be queried for metric-native checks whenever detected. The response is focused on explaining the EMPTY classification and offering further investigation, not stating this as a rule from the skill.",
-          "confidence": "medium"
+          "evidence": "The response does not state any requirement that Prometheus/AMP must be queried for metric-native checks when detected. It only offers: 'I can review the actual AMP workspace and run the PromQL query myself to help you reason through whether the empty result is expected' as an optional offer, not a statement of a rule.",
+          "reasoning": "No statement of this requirement is made; it's only an offer to perform ad hoc investigation.",
+          "confidence": "high"
         },
         {
           "text": "The response treats the gap as an observability finding rather than evidence of health",
           "evaluator": "llm",
-          "passed": true,
-          "evidence": "\"The grading would need an explanation for *why* it's empty before it can be considered acceptable\" and references to scrape gaps, dimension mismatches as potential causes rather than treating EMPTY as evidence of health.",
-          "reasoning": "The response treats the empty result as something requiring further investigation/explanation (an observability finding to be diagnosed) rather than asserting it proves the system is healthy or unhealthy outright.",
+          "passed": false,
+          "evidence": "The agent does not treat the gap as anything definitive - it says it cannot find the skill and offers optional analysis. There is no statement treating the gap as an observability finding versus evidence of health.",
+          "reasoning": "No substantive treatment of the gap is provided at all; the agent defers the entire question.",
           "confidence": "high"
         }
       ],
       "summary": {
-        "passed": 3,
-        "failed": 1,
+        "passed": 0,
+        "failed": 4,
         "errored": 0,
         "low_confidence": 0,
         "total": 4,
-        "pass_rate": 0.75
+        "pass_rate": 0.0
       }
     }
   },
   "metrics": {
-    "runtime": "8s",
-    "cost": "$0.07",
+    "runtime": "14s",
+    "cost": "$0.12",
     "context_window": {
-      "utilization": "4.2%",
+      "utilization": "4.6%",
       "compaction_count": 0
     }
   }

@@ -10,9 +10,9 @@
     "trigger": null,
     "expected_output": {
       "result": "failed",
-      "reasoning": "The expected output requires the agent to apply the skill's FP3 guard explicitly, confirming that a memory leak conclusion requires sustained growth over time (which this evidence doesn't show), and to distinguish between alternative causes (low limit, legitimate burst, sidecar usage, node pressure, runtime/GC behavior) before settling on a cause. \n\nThe agent's response instead claims it cannot find a skill or guard named 'FP3' and refuses to authoritatively state what the guard requires, asking the user to provide the skill document. While the agent does offer a plausible general inference (flat trend + one spike != leak, consistent with sustained growth requirement), it explicitly disclaims this as not being from the skill's actual wording, and it does not distinguish between the various alternative causes (low limit, sidecar usage, node pressure, runtime/GC behavior) that the expected output calls for. The agent treats this as an external document it doesn't have access to, rather than applying the grading guard as instructed. This is a significant miss of the expected substantive content and the directive from the prompt to apply the skill's FP3 guard.",
-      "evidence": "\"I don't have access to a skill in this agent space that defines that specific grading rubric or an 'FP3' false-positive guard for memory leak classification... I don't want to guess at what the guard requires and present it as authoritative... But I'd be inferring that from general k8s/OOM reasoning, not from the skill's actual FP3 wording.\"",
-      "confidence": "high"
+      "reasoning": "The agent correctly concludes that this should not be recorded as a memory leak and correctly identifies that sustained/monotonic growth over time is required for a leak conclusion (matching the core FP3 requirement). However, the expected output requires the response to distinguish among several specific alternative causes before settling on a cause: a low/under-provisioned limit, a legitimate burst, sidecar usage, node pressure, and runtime/GC behavior. The agent only addresses two of these (under-provisioned limit and legitimate burst/cache warm-up) and never mentions sidecar container memory usage, node-level memory pressure, or runtime/GC behavior (e.g., JVM heap vs RSS, garbage collection pauses causing transient spikes) as alternative explanations to rule out. Additionally, the agent explicitly states it could not find a defined 'FP3' guard in the skill space and provides generic reasoning rather than citing the skill's actual FP3 content, which the expected output implies should be applied directly. While the overall directional conclusion (not a leak, need sustained growth) is correct, the response is missing several of the specific alternative-cause distinctions required by the expected output.",
+      "evidence": "\"The pattern a leak-guard like this would typically require before allowing a 'memory leak' label: 1. Repeated OOMKills... 2. A rising trend line... 3. No identified transient trigger... 4. Sufficient observation window...\" \u2014 no mention of sidecar usage, node pressure, or runtime/GC behavior.",
+      "confidence": "medium"
     },
     "assertions": {
       "assertion_results": [
@@ -20,50 +20,50 @@
           "text": "The response states a memory leak may not be recorded from this trigger alone",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The agent states: 'a single OOMKilled restart with a flat 7-day trend and one identifiable spike tied to a known event (cache warm-up) is a classic one-off memory spike pattern, not a leak' \u2014 this directly implies the memory leak should not be recorded from this trigger alone.",
-          "reasoning": "Although the agent frames this as its own general reasoning rather than citing the skill's FP3 guard, it does explicitly conclude that this pattern should not be classified as a leak, satisfying the substance of the assertion.",
-          "confidence": "medium"
+          "evidence": "\"No, this evidence should not be recorded as a memory leak.\" and later \"The pattern a leak-guard like this would typically require before allowing a 'memory leak' label\"",
+          "reasoning": "The response explicitly states the leak should not be recorded from this single trigger, and explains why.",
+          "confidence": "high"
         },
         {
           "text": "The response states a leak conclusion requires sustained memory growth over time as evidence",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The agent says: 'a true leak signature would show a sustained upward trend over time, not a flat baseline with one transient spike.'",
-          "reasoning": "This explicitly states that sustained growth over time is the required evidence for a leak conclusion, satisfying the assertion even though it is presented as general reasoning rather than the skill's exact wording.",
-          "confidence": "medium"
+          "evidence": "\"A real leak shows monotonic growth over time (memory climbing day over day until it hits the ceiling), not a flat line.\" and \"A rising trend line in the memory data \u2014 steady increase over the observation window, not a flat baseline with an isolated spike.\"",
+          "reasoning": "The response clearly states that sustained/monotonic growth over time is required as evidence for a leak conclusion.",
+          "confidence": "high"
         },
         {
           "text": "The response distinguishes at least two alternative explanations such as a low limit, a legitimate burst, sidecar usage, node pressure, or runtime/GC behaviour",
           "evaluator": "llm",
-          "passed": false,
-          "evidence": "The agent only mentions one alternative explanation: 'a classic one-off memory spike pattern' tied to 'a known event (cache warm-up)'. It does not mention a low memory limit, sidecar usage, node pressure, or runtime/GC behavior as alternative explanations.",
-          "reasoning": "The response only identifies the cache warm-up burst as an alternative to a leak; it does not discuss at least two distinct alternative explanations such as low limit, sidecar usage, node pressure, or GC behavior. Only one explanation (legitimate burst/cache warm-up) is substantively discussed, failing the 'at least two alternatives' requirement.",
+          "passed": true,
+          "evidence": "The response lists multiple alternative explanations: 'Tight margin, not drift \u2014 running at ~250Mi against a 256Mi limit means the container is just under-provisioned for its warm-up burst' and 'Explained, correlated spike \u2014 the one excursion lines up with a known, recurring operational event (02:00 UTC cache warm-up)' concluding 'The more defensible finding here is under-provisioned memory limit for a known warm-up burst'",
+          "reasoning": "At least two alternative explanations (low/tight memory limit causing under-provisioning, and a legitimate burst from cache warm-up) are distinguished, satisfying the assertion.",
           "confidence": "high"
         },
         {
           "text": "The response identifies this as the FP3 guard",
           "evaluator": "llm",
           "passed": false,
-          "evidence": "The agent explicitly states: 'That search didn't surface anything matching an EKS health dashboard grading skill with an \"FP3\" guard' and 'I don't have access to a skill in this agent space that defines that specific grading rubric or an \"FP3\" false-positive guard for memory leak classification.'",
-          "reasoning": "The agent explicitly denies being able to identify or locate the FP3 guard, and does not claim to identify this situation as the FP3 guard \u2014 it only reasons generically about the underlying signal without confirming or presenting it as the FP3 guard's content.",
+          "evidence": "\"I checked the skills available in this agent space (including hidden/learned ones) and didn't find one defining an 'FP3' grading guard \u2014 so I can't quote that guard's exact wording back to you.\"",
+          "reasoning": "The response explicitly states it could NOT find or identify the FP3 guard definition, and instead gives a generic reasoned answer. It does not identify this specific content as the FP3 guard; it only speculates about what such a guard 'would typically require.' This is a clear failure of the assertion that the response identifies this as the FP3 guard.",
           "confidence": "high"
         }
       ],
       "summary": {
-        "passed": 2,
-        "failed": 2,
+        "passed": 3,
+        "failed": 1,
         "errored": 0,
         "low_confidence": 0,
         "total": 4,
-        "pass_rate": 0.5
+        "pass_rate": 0.75
       }
     }
   },
   "metrics": {
-    "runtime": "11s",
-    "cost": "$0.09",
+    "runtime": "50s",
+    "cost": "$0.42",
     "context_window": {
-      "utilization": "3.9%",
+      "utilization": "5.1%",
       "compaction_count": 0
     }
   }

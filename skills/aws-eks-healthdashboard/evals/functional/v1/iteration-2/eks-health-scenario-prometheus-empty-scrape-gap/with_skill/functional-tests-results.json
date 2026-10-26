@@ -14,8 +14,8 @@
     },
     "expected_output": {
       "result": "passed",
-      "reasoning": "The agent explicitly states this is not a PASS, and characterizes the empty Prometheus result as a 'scrape-coverage gap' caused by histograms being dropped or the apiserver job not being scraped - matching the expected output almost verbatim. It also correctly notes this should be recorded as a gap/unknown rather than treated as evidence of health, which aligns with the 'recorded as a gap rather than health' criterion.",
-      "evidence": "\"this is a scrape-coverage gap (histograms dropped / apiserver job not scraped), not a PASS... It should be graded with low/unknown confidence (not PASS...)\"",
+      "reasoning": "The agent's response correctly states this is not a PASS, and explicitly characterizes the empty Prometheus result as a \"scrape-coverage gap\" (histograms dropped / apiserver job not scraped), matching the expected output almost verbatim. It also correctly notes it should be recorded as a gap/finding rather than a pass or N/A, aligning with the expectation that it is recorded as a gap rather than health.",
+      "evidence": "\"A Prometheus query that returns empty for a metric that should exist is a scrape-coverage gap (histograms dropped / apiserver job not scraped), not a PASS.\" ... \"record this as a scrape-coverage gap finding \u2014 likely indicating the histogram was dropped during scraping or the apiserver job isn't being scraped at all\"",
       "confidence": "high"
     },
     "assertions": {
@@ -24,33 +24,33 @@
           "text": "The response states the empty Prometheus result is not a PASS",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"That's a **no, not a PASS**.\" and later \"this is a **scrape-coverage gap**... It should be graded with low/unknown confidence (not PASS...)\"",
-          "reasoning": "The response explicitly states the result is not a PASS.",
+          "evidence": "The response explicitly states: 'Based on the skill's grading rules, this is **not a PASS**.'",
+          "reasoning": "The output directly and unambiguously states the result is not a PASS, satisfying this assertion.",
           "confidence": "high"
         },
         {
           "text": "The response characterises it as a scrape-coverage gap, such as histograms dropped or the apiserver job not scraped",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"A Prometheus query that returns empty for a metric that should exist is a **scrape-coverage gap** (histograms dropped / apiserver job not scraped), not a PASS.\" and \"most likely the apiserver histogram was dropped during scraping, or the apiserver job isn't being scraped at all.\"",
-          "reasoning": "The response directly characterizes the empty result as a scrape-coverage gap, explicitly mentioning histograms dropped and apiserver job not scraped, matching the assertion.",
+          "evidence": "The response quotes: 'A Prometheus query that returns empty for a metric that should exist is a **scrape-coverage gap** (histograms dropped / apiserver job not scraped), not a PASS.' and later restates 'record this as a scrape-coverage gap finding \u2014 likely indicating the histogram was dropped during scraping or the apiserver job isn't being scraped at all'",
+          "reasoning": "The response explicitly characterizes the empty result as a scrape-coverage gap and mentions both candidate causes (histograms dropped, apiserver job not scraped), directly matching the assertion.",
           "confidence": "high"
         },
         {
           "text": "The response states Prometheus/AMP must be queried for the metric-native checks when detected",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"Given AMP was detected in Step 1, the skill also requires you to have actually queried it (mandatory, not optional) before falling back further\"",
-          "reasoning": "The response states that since AMP was detected, querying it is mandatory, satisfying the assertion that Prometheus/AMP must be queried when detected.",
+          "evidence": "The response states: 'since Prometheus/AMP was detected, the skill requires it to be queried for every CP-M/NH-P check (mandatory fallback), so an empty result here is a gap to investigate/report, not a shortcut to either PASS or N/A.'",
+          "reasoning": "The response explicitly asserts that once Prometheus/AMP is detected, it must be queried for the relevant checks (CP-M/NH-P, which are metric-native checks), satisfying this assertion.",
           "confidence": "high"
         },
         {
           "text": "The response treats the gap as an observability finding rather than evidence of health",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "\"this is a **scrape-coverage gap**... It should be graded with low/unknown confidence (not PASS, and not silently marked N/A either...)\"",
-          "reasoning": "The response frames the empty result as an observability/data-collection issue (scrape-coverage gap, unknown confidence) rather than treating it as evidence that the system is healthy, implicitly treating it as an observability finding rather than health evidence. Though not explicitly phrased as 'observability finding', the substance aligns with the assertion.",
-          "confidence": "medium"
+          "evidence": "The response states: 'The correct handling is to record this as a scrape-coverage gap finding... apply the FP11 guard, and record a confidence level with the verdict, rather than defaulting the check to a clean pass' and 'an empty result here is a gap to investigate/report, not a shortcut to either PASS or N/A.'",
+          "reasoning": "The response treats the empty result as an observability/finding issue to be investigated and reported, explicitly distinguishing it from a clean pass or health confirmation, which aligns with treating it as a finding rather than evidence of health.",
+          "confidence": "high"
         }
       ],
       "summary": {
@@ -64,10 +64,10 @@
     }
   },
   "metrics": {
-    "runtime": "7s",
-    "cost": "$0.06",
+    "runtime": "5s",
+    "cost": "$0.04",
     "context_window": {
-      "utilization": "5.1%",
+      "utilization": "4.5%",
       "compaction_count": 0
     }
   }

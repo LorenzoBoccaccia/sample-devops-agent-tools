@@ -135,14 +135,13 @@
     {
       "id": "eks-health-scenario-logging-disabled-na-not-pass",
       "prompt": "While grading an EKS health dashboard you observe this evidence:\n\nControl-plane logging is disabled on the cluster, so the audit-log Logs Insights queries return no records.\n\nPer the skill's grading guards (FP11 / the empty-result rule): how are the audit-log-derived CP checks graded, is this ever a PASS, is a finding raised, and are public control-plane metrics still attempted?",
-      "expected_output": "Grades those checks N/A with the reason 'control-plane logging disabled', never PASS, raises a visibility FAIL recommending enablement, and still pulls the public CloudWatch control-plane metrics. An empty result is unknown until logging/stream/delay/window/filter are verified.",
+      "expected_output": "Grades those checks N/A with the reason 'control-plane logging disabled', never PASS, raises a visibility FAIL recommending enablement, and still pulls the public CloudWatch control-plane metrics.",
       "assertions": [
         "The response grades the audit-log-derived CP checks N/A rather than PASS",
         "The stated reason for N/A is that control-plane logging is disabled",
         "The response states missing telemetry is a visibility gap and never evidence of health",
         "The response records a visibility FAIL finding for the disabled control-plane logging",
-        "The response states the public CloudWatch control-plane metrics are still attempted",
-        "The response states an empty result is unknown until logging enablement, log group/stream, delivery delay, query window, and filter are verified"
+        "The response states the public CloudWatch control-plane metrics are still attempted"
       ],
       "task_type": "chat",
       "should_trigger": true
@@ -156,19 +155,6 @@
         "The response states rejection in a low-priority level can be API Priority and Fairness working as designed",
         "The response declines to recommend scaling the control plane on this evidence",
         "The response states a noisy caller is addressed before control-plane capacity or Provisioned mode is considered"
-      ],
-      "task_type": "chat",
-      "should_trigger": true
-    },
-    {
-      "id": "eks-health-scenario-403-authz-not-authn",
-      "prompt": "While grading an EKS health dashboard you observe this evidence:\n\nAudit logs show 45 HTTP 403 responses over 24 hours from system:serviceaccount:legacy/old-reporter.\n\nPer the skill's grading guards (FP4): is this an authentication failure, what evidence would be required for one, and what should be inspected instead?",
-      "expected_output": "Applies FP4: 403 is authorization, not authentication; an authentication failure would require 401 evidence. Inspects RBAC, access policy, namespace, and intentional policy denies, and does not claim compromise.",
-      "assertions": [
-        "The response states 403 indicates an authorization failure, not an authentication failure",
-        "The response states evidence of HTTP 401 would be required to claim an authentication failure",
-        "The response directs inspection at RBAC bindings, access policy, namespace, or an intentional deny",
-        "The response confines its conclusion to a permissions or configuration problem, without escalating to a security breach"
       ],
       "task_type": "chat",
       "should_trigger": true

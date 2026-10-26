@@ -14,8 +14,8 @@
     },
     "expected_output": {
       "result": "passed",
-      "reasoning": "The agent's response explicitly checks all four FP6 verification items (duration >5 min, priority level, reason, caller identity), correctly notes the 3-minute burst fails the duration threshold, characterizes workload-low rejection during a rollout as APF working as designed to protect higher-priority traffic, concludes that scaling the control plane is NOT justified, and recommends fixing the noisy caller before considering Provisioned mode/control-plane scaling. This matches all elements of the expected output.",
-      "evidence": "\"Duration > 5 minutes \u2014 your burst is 3 minutes, which already fails this threshold... rejecting low-priority traffic during a burst is exactly what Priority & Fairness is designed to do... the prescribed path is: identify and fix the noisy caller behind the rollout burst first. Scaling to Provisioned/extended mode is only warranted if... none of which is shown yet.\"",
+      "reasoning": "The agent's response addresses all the required elements: it lists the four verification criteria (duration >5 minutes, priority level, reason code, caller), explicitly states the 3-minute burst doesn't meet the duration threshold, correctly frames the workload-low rejection as APF 'working as designed' rather than overall saturation, and recommends fixing the noisy caller before considering Provisioned (Flat) mode or control-plane scaling. This matches the expected output description point-for-point.",
+      "evidence": "\"Duration > 5 minutes \u2014 a 3-minute burst doesn't clear this bar on its own... It's confined to workload-low. APF is deliberately prioritizing other levels... that's APF working as designed... The correct next step per the guard is to identify and fix the noisy caller... before recommending a move to API server Provisioned (Flat) mode.\"",
       "confidence": "high"
     },
     "assertions": {
@@ -24,32 +24,32 @@
           "text": "The response requires the duration (beyond five minutes), priority level, reason, and calling identity to be verified before saturation is claimed",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response lists: '1. Duration > 5 minutes...2. Priority level...3. reason...4. Caller identity \u2014 need to identify who was issuing the throttled requests' as what must be verified before calling it saturation.",
-          "reasoning": "All four elements (duration >5min, priority level, reason, caller identity) are explicitly listed as required verification items.",
+          "evidence": "The response lists exactly these four: 'Duration > 5 minutes', 'Priority level \u2014 which APF priority level...', 'reason \u2014 the audit/metric reason code...', and 'Caller \u2014 who's generating the load...'",
+          "reasoning": "All four required verification elements (duration >5min, priority level, reason, caller/calling identity) are explicitly listed as required evidence before calling it saturation.",
           "confidence": "high"
         },
         {
           "text": "The response states rejection in a low-priority level can be API Priority and Fairness working as designed",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "'That matters because low-tier rejection under APF is often the system working as designed, not a failure.' and later: 'rejecting low-priority traffic during a burst is exactly what Priority & Fairness is designed to do to protect higher-priority traffic'",
-          "reasoning": "The response explicitly states low-priority rejection can be APF working as intended.",
+          "evidence": "The response states: 'APF is deliberately prioritizing other levels (e.g., system, leader-election, workload-high) over low-priority traffic during contention \u2014 that's APF working as designed, not evidence of overall control-plane saturation.'",
+          "reasoning": "This directly asserts that low-priority-level rejection can be APF working as designed, matching the assertion.",
           "confidence": "high"
         },
         {
           "text": "The response declines to recommend scaling the control plane on this evidence",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "'Does this justify scaling the control plane? No.' and 'The correct verdict here is not \"sustained API saturation; scale the control plane.\"'",
-          "reasoning": "The agent explicitly declines to recommend scaling based on the evidence given.",
+          "evidence": "The response states: 'Does this justify scaling the control plane? No \u2014 not with this evidence.'",
+          "reasoning": "The agent explicitly declines to recommend scaling the control plane given the current evidence.",
           "confidence": "high"
         },
         {
           "text": "The response states a noisy caller is addressed before control-plane capacity or Provisioned mode is considered",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "'Per FP6, the prescribed path is: identify and fix the noisy caller behind the rollout burst first. Scaling to Provisioned/extended mode is only warranted if, after checking caller/reason, you find this pattern recurring...'",
-          "reasoning": "The response explicitly states fixing the noisy caller comes before considering scaling/Provisioned mode.",
+          "evidence": "The response states: 'The correct next step per the guard is to identify and fix the noisy caller... before recommending a move to API server Provisioned (Flat) mode.'",
+          "reasoning": "This explicitly states that addressing the noisy caller should occur before considering control-plane capacity changes or Provisioned mode, matching the assertion.",
           "confidence": "high"
         }
       ],
@@ -64,8 +64,8 @@
     }
   },
   "metrics": {
-    "runtime": "14s",
-    "cost": "$0.12",
+    "runtime": "11s",
+    "cost": "$0.10",
     "context_window": {
       "utilization": "4.8%",
       "compaction_count": 0

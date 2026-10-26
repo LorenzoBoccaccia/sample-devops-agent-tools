@@ -14,8 +14,8 @@
     },
     "expected_output": {
       "result": "passed",
-      "reasoning": "The agent clearly states this is Not a PASS, and characterizes the empty Prometheus result as a 'scrape-coverage gap (e.g., histograms dropped, or the apiserver job isn't being scraped)' which directly matches the expected language. It also notes this should be recorded as a gap/finding rather than being treated as health/PASS, consistent with the expected output.",
-      "evidence": "\"the skill explicitly characterizes that as a **scrape-coverage gap** (e.g., histograms dropped, or the apiserver job isn't being scraped) \u2014 **not** a PASS... The correct handling is to record it as a gap/finding...\"",
+      "reasoning": "The agent's response explicitly states this is not a PASS, and characterizes the empty Prometheus result for a metric that should exist as a 'scrape-coverage gap' with likely causes being 'histograms dropped' or 'apiserver job not scraped' - matching almost verbatim the expected output. It further emphasizes this must be recorded as a gap/unknown rather than health, aligning with the expectation that it be 'recorded as a gap rather than health.'",
+      "evidence": "\"Status: not PASS \u2014 treat as a gap/unknown, specifically a scrape-coverage gap (likely cause: histograms dropped at scrape/relabel time, or the apiserver job isn't being scraped at all)\" and \"This gap itself must be surfaced as a finding (observability gap)\"",
       "confidence": "high"
     },
     "assertions": {
@@ -24,32 +24,32 @@
           "text": "The response states the empty Prometheus result is not a PASS",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "The response begins with 'Not a PASS.' and later reiterates 'never scored \u2705 PASS.'",
-          "reasoning": "Directly and explicitly states the result is not a PASS.",
+          "evidence": "The response explicitly states: 'This is **not a PASS**.' and 'Status: not PASS \u2014 treat as a gap/unknown'",
+          "reasoning": "The output directly and unambiguously states the empty Prometheus result is not a PASS.",
           "confidence": "high"
         },
         {
           "text": "The response characterises it as a scrape-coverage gap, such as histograms dropped or the apiserver job not scraped",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "'the skill explicitly characterizes that as a scrape-coverage gap (e.g., histograms dropped, or the apiserver job isn't being scraped)'",
-          "reasoning": "The response explicitly uses the term 'scrape-coverage gap' and gives the exact examples listed in the assertion (histograms dropped, apiserver job not scraped).",
+          "evidence": "The response states: 'a scrape-coverage gap (histograms dropped / apiserver job not scraped), not a PASS' and repeats 'specifically a **scrape-coverage gap** (likely cause: histograms dropped at scrape/relabel time, or the apiserver job isn't being scraped at all)'",
+          "reasoning": "The response explicitly characterizes the empty result as a scrape-coverage gap and names both histogram-dropping and apiserver job not being scraped as likely causes, matching the assertion exactly.",
           "confidence": "high"
         },
         {
           "text": "The response states Prometheus/AMP must be queried for the metric-native checks when detected",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "'An AMP workspace being detected in Step 1 makes querying it mandatory for the CP-M checks (CloudWatch \u2192 Prometheus/AMP if detected \u2192 raw /metrics \u2192 N/A) \u2014 it's not optional just because CloudWatch returned something.'",
-          "reasoning": "The response explicitly states that Prometheus/AMP must be queried once detected, as part of the mandatory fallback chain for metric-native checks.",
-          "confidence": "high"
+          "evidence": "The response states 'Since Step 1 confirmed an AMP workspace exists (so Prometheus querying was mandatory for CP-M checks)...' implying that when an AMP workspace is detected, Prometheus querying is mandatory for the metric-native checks.",
+          "reasoning": "The response asserts that detecting an AMP workspace makes Prometheus querying mandatory for CP-M (metric-native) checks, which supports this assertion. It's phrased as a justification rather than a standalone rule statement, but it conveys the same substance - confidence is medium since it's embedded in reasoning rather than stated as a clear standalone requirement rule.",
+          "confidence": "medium"
         },
         {
           "text": "The response treats the gap as an observability finding rather than evidence of health",
           "evaluator": "llm",
           "passed": true,
-          "evidence": "'The correct handling is to record it as a gap/finding, apply the FP11 guard, note confidence, and continue down the fallback chain... So the verdict should be either an explicit finding describing the scrape-coverage gap... never scored \u2705 PASS.'",
-          "reasoning": "The response explicitly frames the empty result as a finding/gap to be recorded and investigated further, rather than treating it as evidence of a healthy system, consistent with the FP11 guard characterization of 'unknown, never an automatic PASS'.",
+          "evidence": "The response states: 'This gap itself must be surfaced as a finding (observability gap), with a recorded confidence level alongside whatever verdict is ultimately assigned to the underlying CP-M check.' and 'treat as a gap/unknown'",
+          "reasoning": "The response explicitly frames the empty result as an observability gap/finding that must be surfaced, rather than treating it as evidence of health (it explicitly says it's not a PASS and is a gap, not health evidence).",
           "confidence": "high"
         }
       ],
@@ -64,10 +64,10 @@
     }
   },
   "metrics": {
-    "runtime": "7s",
+    "runtime": "6s",
     "cost": "$0.06",
     "context_window": {
-      "utilization": "5.1%",
+      "utilization": "4.5%",
       "compaction_count": 0
     }
   }

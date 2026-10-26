@@ -10,43 +10,35 @@
     "trigger": null,
     "expected_output": {
       "result": "failed",
-      "reasoning": "The expected output requires the agent to state that Step 0 requires confirming the target cluster name, region, and account before collecting any data, and that it should never assume the current context. Instead, the agent asked for clarification about which skill the user meant, failing to provide the specific information requested.",
-      "evidence": "\"I don't have an active skill loaded in this conversation yet, so I can't point to a specific 'must confirm first' step without knowing which skill you mean. Could you clarify which skill or workflow you're asking about?\"",
-      "confidence": "high"
+      "reasoning": "No FinalResponse found in chat output. The agent may not have produced a final response."
     },
     "assertions": {
       "assertion_results": [
         {
           "text": "The response states the cluster name, region, and account must be confirmed before any data is collected",
           "evaluator": "llm",
-          "passed": false,
-          "evidence": "The agent's response does not mention cluster name, region, or account at all. Instead it says: 'I don't have an active skill loaded in this conversation yet, so I can't point to a specific \"must confirm first\" step without knowing which skill you mean.'",
-          "reasoning": "The assertion requires the response to state that cluster name, region, and account must be confirmed. The agent instead asked for clarification and did not provide this information.",
-          "confidence": "high"
+          "passed": null,
+          "error": "No FinalResponse found in chat output, so no assertion could be checked."
         },
         {
           "text": "The response states the identity is restated back to the user",
           "evaluator": "llm",
-          "passed": false,
-          "evidence": "No mention of identity being restated back to the user anywhere in the response.",
-          "reasoning": "The response only asks for clarification about which skill is being referenced; it never discusses restating identity.",
-          "confidence": "high"
+          "passed": null,
+          "error": "No FinalResponse found in chat output, so no assertion could be checked."
         },
         {
           "text": "The response states the current context is never assumed",
           "evaluator": "llm",
-          "passed": false,
-          "evidence": "The response contains no statement about 'current context' being assumed or not assumed.",
-          "reasoning": "The agent's output does not address this concept at all, instead requesting clarification from the user.",
-          "confidence": "high"
+          "passed": null,
+          "error": "No FinalResponse found in chat output, so no assertion could be checked."
         }
       ],
       "summary": {
         "passed": 0,
-        "failed": 3,
-        "errored": 0,
+        "failed": 0,
+        "errored": 3,
         "low_confidence": 0,
-        "total": 3,
+        "total": 0,
         "pass_rate": 0.0
       }
     }
