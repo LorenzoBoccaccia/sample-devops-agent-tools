@@ -266,8 +266,7 @@ Test relevant scenarios with and without the custom agent, multiple times. Focus
 
 **Every tool contribution needs a named subject-matter expert, other than the
 author, to review it for technical correctness and say so in the pull request.**
-It is the one required item a maintainer cannot do for you, and the template
-calls it required rather than optional for that reason.
+It is the one required item a maintainer cannot do for you.
 
 Maintainers review what is reviewable from the repository: layout, the publishing
 rules, the eval evidence, whether the content is safe to publish, and whether the
@@ -319,9 +318,11 @@ reach the relevant service team or an internal specialist. A PR held up on a
 sign-off nobody has been asked for is the most common reason a good contribution
 stalls.
 
-This item cannot be waived with the `n/a:` escape described under "The Pull
-Request Checklist". There is no tool contribution for which domain correctness is
-genuinely not applicable.
+The one exception is a change that alters no technical claim — a typo, a link, a
+label renamed across many skills. Mark the item `n/a:` with that reason, as
+described under "The Pull Request Checklist", and the reviewer judges whether it
+holds. A new tool, or any change to what a tool tells the agent to do, still
+needs the sign-off.
 
 ## Redacting AWS Identifiers
 
@@ -443,7 +444,7 @@ NOTE: a red check does not block merging on its own. An admin must add the job's
 The pull request template carries a set of required items, and a check
 ([`.github/workflows/validate-pr-checklist.yml`](.github/workflows/validate-pr-checklist.yml))
 reads your PR description and fails when a required box is unchecked. A failing
-check puts a `needs-checklist` label on the PR and a comment listing what is
+check puts a `needs-checklist` label on the PR and a comment pointing to what is
 outstanding. A PR carrying that label is on hold and is not reviewed until it
 clears.
 
@@ -458,7 +459,7 @@ MCP server" names three types at once, so they cannot decide it.
 
 | Your PR changes | Items enforced |
 | --- | --- |
-| Nothing under `skills/`, `mcp/` or `custom-agents/` | Only the two items that apply to every contribution, wherever they sit: no internal-only content, and the licence confirmation |
+| Nothing under `skills/`, `mcp/` or `custom-agents/` | Only the two items that apply to every contribution, in Required before review and License confirmation: no internal-only content, and the licence confirmation |
 | Anything under `skills/` | Every item in Required before review, Security and safety, License confirmation, and the Skills section |
 | Anything under `mcp/` | The same, with the MCP servers section instead of Skills |
 | Anything under `custom-agents/` | The same, with the Custom agents section |
@@ -490,9 +491,8 @@ is the part being judged. And **it has to be on the same line as the checkbox**:
 the check reads line by line, so a reason wrapped onto the next line leaves the
 box looking plainly unchecked. Keep the item on one line however long it gets.
 
-Three items can never be waived this way:
+Two items can never be waived this way:
 
-- the **domain SME sign-off**, for the reason given in its own section above
 - **no internal-only or proprietary content**, because this repository is public
   and the claim is about every file in the PR
 - the **licence confirmation**, which is a statement only you can make
@@ -531,10 +531,14 @@ Three cases report their findings in the check's step summary and pass:
 
 The check's summary on the workflow run page lists every item it found unmet,
 which applied and why, and anything you marked `n/a:` with its reason — including
-for the cases above that pass. The comment on the PR carries the same list.
+for the cases above that pass. The comment on the PR links to that summary rather
+than repeating it, so the bot never posts text taken from a PR description.
+
+If the check itself cannot run — a failed fetch, say — it fails saying so, and
+leaves the label and comment as they were: nothing was concluded about your PR.
 
 The check runs on the PR being opened, edited, pushed to, reopened, marked ready
-for review, and labelled. Ticking a box edits the description, so the check
+for review, labelled, and unlabelled. Ticking a box edits the description, so the check
 re-runs and clears on its own; there is nothing to ask a maintainer to re-trigger.
 
 ## Reporting Bugs/Feature Requests
