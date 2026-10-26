@@ -2,6 +2,9 @@
 
 All notable changes to this skill are documented here. New entries go at the top.
 
+## [1.0.3] - 2026-10-22
+- Updated the link to the skill IAM policies template, which moved to `cloudformation/devops-agent-skill-policies/`.
+
 ## [1.0.2] - 2026-10-21
 - README: corrected the agent types to the names the operator app shows (`Chat tasks`, `Incident triage`, `All agents`) and removed `Evaluation` and `On-demand`, which are not agent types.
 
