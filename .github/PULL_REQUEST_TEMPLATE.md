@@ -44,10 +44,15 @@ REVIEWERS: if this PR adds or changes a skill's `evals/exemptions.json`, that fi
 waives the eval-results requirement for the named test types, so the check cannot
 judge it for you. Check that the `reason` names a real blocker, that the PR carries
 manual with-skill / without-skill DevOps Agent output in place of the missing
-results, and that nothing is exempted that could simply have been run. If a reason
-does not hold, add the `enforce-evals` label: that withdraws every exemption on the
-PR and requires the results after all, and the check's log then names each reason it
-rejected. See the "When a test type can't be run" section in CONTRIBUTING.md.
+results, and that nothing is exempted that could simply have been run. The one
+exception is a partner-managed skill that commits the standard exemption from
+CONTRIBUTING.md: it attaches no manual output, because a maintainer checks that the
+skill installs and loads before the connector that recommends it is promoted. Check
+instead that `metadata.tier` is `partner-managed` and that the author is the
+partner. If a reason does not hold, add the `enforce-evals` label: that withdraws
+every exemption on the PR and requires the results after all, and the check's log
+then names each reason it rejected. See the "When a test type can't be run" section
+in CONTRIBUTING.md.
 
 Also: pull requests that were already open when the eval-results check was
 introduced are listed in the script by number, so the check passes with warnings
