@@ -23,7 +23,7 @@ Fill in every section that applies, and delete the entry-type sections that don'
 <!-- These are gates. A PR is not ready for review until each applicable box is checked. -->
 
 - [ ] **Repository layout is correct** — skills in `/skills`, MCP servers in `/mcp`, custom agents in `/custom-agents`; skills and MCP servers are never mixed in one directory.
-- [ ] **A domain SME has reviewed and signed off.** A named subject-matter expert for this domain — someone other than the author — has reviewed the tool for technical correctness and approved it in this PR. Required, not optional.
+- [ ] **A domain SME has reviewed and signed off.** A named subject-matter expert for this domain — someone other than the author — has reviewed the tool for technical correctness and approved it in this PR. Required for any change to what the tool tells the agent; an edit that changes no technical claim can be marked n/a with the reason, as CONTRIBUTING.md describes.
 - [ ] **Evaluation evidence is included** (see Testing).
 - [ ] **No internal-only or proprietary content** — no internal hostnames, account IDs, customer names, ticket numbers, internal URLs, or secrets in the tool, its examples, or its tests.
 - [ ] **README is complete** — prerequisites, setup/deployment, and at least one sample prompt or usage example.
