@@ -4,6 +4,7 @@ description: "Use this skill when the user wants to know whether an Amazon EKS c
 metadata:
   author: kuntshah
   version: 1.0.0
+  aws-devops-agent-skills.agent-types: "CHAT"
 ---
 
 # EKS Health Dashboard — DevOps Agent Skill
