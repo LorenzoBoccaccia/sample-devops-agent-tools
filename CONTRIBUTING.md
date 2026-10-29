@@ -41,7 +41,7 @@ Follow these guidelines for each tool:
 
 #### Skill Metadata
 
-Make sure the frontmatter in the `SKILL.md` file includes a `metadata` block with `version`, `author` (your GitHub user) and `aws-devops-agent-skills.*` fields (see examples in existing skills)
+Make sure the frontmatter in the `SKILL.md` file includes a `metadata` block with `version`, `author` (your GitHub user, or your team as `org/team`) and `aws-devops-agent-skills.*` fields (see examples in existing skills)
 
 #### Skill Publishing Rules
 
@@ -56,7 +56,7 @@ Skills on `main` are published automatically, so a pull request check ([`.github
 | `title` | Optional display name. Non-empty, one line, at most 100 characters. |
 | `license`, `compatibility`, `allowed-tools` | Optional. When present, non-empty text; `compatibility` is at most 500 characters. |
 | `metadata` | Required. A mapping whose values are all text. Quote any value YAML would otherwise read as a number or true/false, such as `deprecated: "true"`. A key that isn't listed below is a warning, with the nearest known key when there is one. |
-| `metadata.author` | Required. One or more GitHub usernames separated by commas. |
+| `metadata.author` | Required. One or more GitHub usernames or teams (`org/team`, such as `octo-org/octo-team`) separated by commas, without a leading `@`. |
 | `metadata.version` | Required. `MAJOR.MINOR.PATCH`, such as `"1.2.0"`, with no prefix, suffix or leading zeros, at most 32 characters and at most 10 digits in each part. |
 | `metadata.summary` | One line, at most 200 characters, shown as the skill's card text in catalogs. A missing or empty summary is a warning for now; it becomes required once every skill has one. |
 | `metadata.deprecated` | Optional. `"true"` or `"false"`. |
